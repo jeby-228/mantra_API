@@ -1,5 +1,5 @@
-# Dockerfile for Member API
-# Build with: docker build -t member-api .
+# Dockerfile for Mantra API
+# Build with: docker build -t mantra-api .
 
 FROM golang:1.26-alpine AS builder
 WORKDIR /src
@@ -8,7 +8,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o member_api ./main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o mantra_api ./main.go
 
 FROM alpine:3.21
 RUN apk --no-cache add ca-certificates wget && \
@@ -16,7 +16,7 @@ RUN apk --no-cache add ca-certificates wget && \
     update-ca-certificates
 WORKDIR /app
 
-COPY --from=builder /src/member_api ./member_api
+COPY --from=builder /src/mantra_api ./mantra_api
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
@@ -24,4 +24,4 @@ USER appuser
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
-ENTRYPOINT ["./member_api"]
+ENTRYPOINT ["./mantra_api"]

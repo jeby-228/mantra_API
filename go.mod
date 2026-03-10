@@ -1,4 +1,4 @@
-module member_API
+module mantra_API
 
 go 1.26
 

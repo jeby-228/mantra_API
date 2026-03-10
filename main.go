@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
-	"member_API/config"
-	"member_API/controllers"
-	"member_API/graphql"
-	"member_API/models"
-	"member_API/routes"
+	"mantra_API/config"
+	"mantra_API/controllers"
+	"mantra_API/graphql"
+	"mantra_API/models"
+	"mantra_API/routes"
 
-	_ "member_API/docs" // 導入 swagger 文檔
+	_ "mantra_API/docs" // 導入 swagger 文檔
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv" // 新增

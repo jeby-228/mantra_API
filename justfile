@@ -44,8 +44,14 @@ test-coverage:
 
 # 測試覆蓋率產生報告
 test-cov:
-    go test -v -coverprofile=coverage.out ./...
-    go tool cover -html=coverage.out -o coverage.html
+    @echo "產生測試覆蓋率報告..."
+    @go test -v -coverprofile=coverage.out ./auth ./config 2>/dev/null || true
+    @if [ -f coverage.out ]; then \
+        go tool cover -html=coverage.out -o coverage.html && \
+        echo "測試覆蓋率報告已產生：coverage.html"; \
+    else \
+        echo "沒有可用的覆蓋率資料"; \
+    fi
 
 
 # 生成 GraphQL

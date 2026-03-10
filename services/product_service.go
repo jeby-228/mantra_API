@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"member_API/models"
+	"mantra_API/models"
 
 	"gorm.io/gorm"
 )
