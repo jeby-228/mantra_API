@@ -1,0 +1,115 @@
+"""
+GraphQL Schema for Member API.
+This SDL mirrors the implemented queries in the Go resolvers.
+"""
+type Member {
+  id: ID!
+  name: String!
+  email: String!
+  created_at: String
+  updated_at: String
+}
+
+# ========== Product Type ==========
+type Product {
+  id: ID!
+  product_name: String!
+  product_price: Float!
+  product_description: String
+  product_image: String
+  product_stock: Int!
+  created_at: String
+  updated_at: String
+}
+
+type Query {
+  """
+  Fetch a single member by ID
+  """
+  member(id: ID!): Member
+
+  """
+  Fetch a list of members (default limit: 50)
+  """
+  members(limit: Int): [Member!]!
+
+  # ========== Product Queries ==========
+  """
+  Fetch a single product by ID
+  """
+  product(id: ID!): Product
+
+  """
+  Fetch a list of products with pagination
+  """
+  products(limit: Int, offset: Int): ProductsResponse!
+}
+
+# ========== Product Response with Pagination ==========
+type ProductsResponse {
+  products: [Product!]!
+  total: Int!
+  limit: Int!
+  offset: Int!
+}
+
+type Mutation {
+  """
+  Create a new member
+  """
+  createMember(input: CreateMemberInput!): Member!
+
+  """
+  Update an existing member
+  """
+  updateMember(id: ID!, input: UpdateMemberInput!): Member!
+
+  """
+  Delete a member (soft delete)
+  """
+  deleteMember(id: ID!): Boolean!
+
+  # ========== Product Mutations ==========
+  """
+  Create a new product
+  """
+  createProduct(input: CreateProductInput!): Product!
+
+  """
+  Update an existing product
+  """
+  updateProduct(id: ID!, input: UpdateProductInput!): Product!
+
+  """
+  Delete a product (soft delete)
+  """
+  deleteProduct(id: ID!): Boolean!
+}
+
+input CreateMemberInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input UpdateMemberInput {
+  name: String!
+  email: String!
+}
+
+# ========== Product Inputs ==========
+input CreateProductInput {
+  product_name: String!
+  product_price: Float!
+  product_description: String
+  product_image: String
+  product_stock: Int!
+}
+
+input UpdateProductInput {
+  product_name: String
+  product_price: Float
+  product_description: String
+  product_image: String
+  product_stock: Int
+}
