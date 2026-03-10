@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"member_API/models"
+	"mantra_API/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

@@ -8,7 +8,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
-	"member_API/graphql/model"
+	"mantra_API/graphql/model"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -472,7 +472,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_createMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateMemberInput2member_APIᚋgraphqlᚋmodelᚐCreateMemberInput)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMemberInput)
 	if err != nil {
 		return nil, err
 	}
@@ -483,7 +483,7 @@ func (ec *executionContext) field_Mutation_createMember_args(ctx context.Context
 func (ec *executionContext) field_Mutation_createProduct_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateProductInput2member_APIᚋgraphqlᚋmodelᚐCreateProductInput)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateProductInput2mantra_APIᚋgraphqlᚋmodelᚐCreateProductInput)
 	if err != nil {
 		return nil, err
 	}
@@ -521,7 +521,7 @@ func (ec *executionContext) field_Mutation_updateMember_args(ctx context.Context
 		return nil, err
 	}
 	args["id"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateMemberInput2member_APIᚋgraphqlᚋmodelᚐUpdateMemberInput)
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMemberInput)
 	if err != nil {
 		return nil, err
 	}
@@ -537,7 +537,7 @@ func (ec *executionContext) field_Mutation_updateProduct_args(ctx context.Contex
 		return nil, err
 	}
 	args["id"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateProductInput2member_APIᚋgraphqlᚋmodelᚐUpdateProductInput)
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateProductInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateProductInput)
 	if err != nil {
 		return nil, err
 	}
@@ -813,7 +813,7 @@ func (ec *executionContext) _Mutation_createMember(ctx context.Context, field gr
 			return ec.resolvers.Mutation().CreateMember(ctx, fc.Args["input"].(model.CreateMemberInput))
 		},
 		nil,
-		ec.marshalNMember2ᚖmember_APIᚋgraphqlᚋmodelᚐMember,
+		ec.marshalNMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember,
 		true,
 		true,
 	)
@@ -866,7 +866,7 @@ func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field gr
 			return ec.resolvers.Mutation().UpdateMember(ctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateMemberInput))
 		},
 		nil,
-		ec.marshalNMember2ᚖmember_APIᚋgraphqlᚋmodelᚐMember,
+		ec.marshalNMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember,
 		true,
 		true,
 	)
@@ -960,7 +960,7 @@ func (ec *executionContext) _Mutation_createProduct(ctx context.Context, field g
 			return ec.resolvers.Mutation().CreateProduct(ctx, fc.Args["input"].(model.CreateProductInput))
 		},
 		nil,
-		ec.marshalNProduct2ᚖmember_APIᚋgraphqlᚋmodelᚐProduct,
+		ec.marshalNProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct,
 		true,
 		true,
 	)
@@ -1019,7 +1019,7 @@ func (ec *executionContext) _Mutation_updateProduct(ctx context.Context, field g
 			return ec.resolvers.Mutation().UpdateProduct(ctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateProductInput))
 		},
 		nil,
-		ec.marshalNProduct2ᚖmember_APIᚋgraphqlᚋmodelᚐProduct,
+		ec.marshalNProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct,
 		true,
 		true,
 	)
@@ -1350,7 +1350,7 @@ func (ec *executionContext) _ProductsResponse_products(ctx context.Context, fiel
 			return obj.Products, nil
 		},
 		nil,
-		ec.marshalNProduct2ᚕᚖmember_APIᚋgraphqlᚋmodelᚐProductᚄ,
+		ec.marshalNProduct2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐProductᚄ,
 		true,
 		true,
 	)
@@ -1485,7 +1485,7 @@ func (ec *executionContext) _Query_member(ctx context.Context, field graphql.Col
 			return ec.resolvers.Query().Member(ctx, fc.Args["id"].(string))
 		},
 		nil,
-		ec.marshalOMember2ᚖmember_APIᚋgraphqlᚋmodelᚐMember,
+		ec.marshalOMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember,
 		true,
 		false,
 	)
@@ -1538,7 +1538,7 @@ func (ec *executionContext) _Query_members(ctx context.Context, field graphql.Co
 			return ec.resolvers.Query().Members(ctx, fc.Args["limit"].(*int))
 		},
 		nil,
-		ec.marshalNMember2ᚕᚖmember_APIᚋgraphqlᚋmodelᚐMemberᚄ,
+		ec.marshalNMember2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMemberᚄ,
 		true,
 		true,
 	)
@@ -1591,7 +1591,7 @@ func (ec *executionContext) _Query_product(ctx context.Context, field graphql.Co
 			return ec.resolvers.Query().Product(ctx, fc.Args["id"].(string))
 		},
 		nil,
-		ec.marshalOProduct2ᚖmember_APIᚋgraphqlᚋmodelᚐProduct,
+		ec.marshalOProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct,
 		true,
 		false,
 	)
@@ -1650,7 +1650,7 @@ func (ec *executionContext) _Query_products(ctx context.Context, field graphql.C
 			return ec.resolvers.Query().Products(ctx, fc.Args["limit"].(*int), fc.Args["offset"].(*int))
 		},
 		nil,
-		ec.marshalNProductsResponse2ᚖmember_APIᚋgraphqlᚋmodelᚐProductsResponse,
+		ec.marshalNProductsResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐProductsResponse,
 		true,
 		true,
 	)
@@ -4173,12 +4173,12 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNCreateMemberInput2member_APIᚋgraphqlᚋmodelᚐCreateMemberInput(ctx context.Context, v any) (model.CreateMemberInput, error) {
+func (ec *executionContext) unmarshalNCreateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMemberInput(ctx context.Context, v any) (model.CreateMemberInput, error) {
 	res, err := ec.unmarshalInputCreateMemberInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateProductInput2member_APIᚋgraphqlᚋmodelᚐCreateProductInput(ctx context.Context, v any) (model.CreateProductInput, error) {
+func (ec *executionContext) unmarshalNCreateProductInput2mantra_APIᚋgraphqlᚋmodelᚐCreateProductInput(ctx context.Context, v any) (model.CreateProductInput, error) {
 	res, err := ec.unmarshalInputCreateProductInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -4231,11 +4231,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNMember2member_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v model.Member) graphql.Marshaler {
+func (ec *executionContext) marshalNMember2mantra_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v model.Member) graphql.Marshaler {
 	return ec._Member(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNMember2ᚕᚖmember_APIᚋgraphqlᚋmodelᚐMemberᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Member) graphql.Marshaler {
+func (ec *executionContext) marshalNMember2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMemberᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Member) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4259,7 +4259,7 @@ func (ec *executionContext) marshalNMember2ᚕᚖmember_APIᚋgraphqlᚋmodelᚐ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMember2ᚖmember_APIᚋgraphqlᚋmodelᚐMember(ctx, sel, v[i])
+			ret[i] = ec.marshalNMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4279,7 +4279,7 @@ func (ec *executionContext) marshalNMember2ᚕᚖmember_APIᚋgraphqlᚋmodelᚐ
 	return ret
 }
 
-func (ec *executionContext) marshalNMember2ᚖmember_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v *model.Member) graphql.Marshaler {
+func (ec *executionContext) marshalNMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v *model.Member) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
@@ -4289,11 +4289,11 @@ func (ec *executionContext) marshalNMember2ᚖmember_APIᚋgraphqlᚋmodelᚐMem
 	return ec._Member(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProduct2member_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v model.Product) graphql.Marshaler {
+func (ec *executionContext) marshalNProduct2mantra_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v model.Product) graphql.Marshaler {
 	return ec._Product(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProduct2ᚕᚖmember_APIᚋgraphqlᚋmodelᚐProductᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Product) graphql.Marshaler {
+func (ec *executionContext) marshalNProduct2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐProductᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Product) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4317,7 +4317,7 @@ func (ec *executionContext) marshalNProduct2ᚕᚖmember_APIᚋgraphqlᚋmodel�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProduct2ᚖmember_APIᚋgraphqlᚋmodelᚐProduct(ctx, sel, v[i])
+			ret[i] = ec.marshalNProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4337,7 +4337,7 @@ func (ec *executionContext) marshalNProduct2ᚕᚖmember_APIᚋgraphqlᚋmodel�
 	return ret
 }
 
-func (ec *executionContext) marshalNProduct2ᚖmember_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v *model.Product) graphql.Marshaler {
+func (ec *executionContext) marshalNProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v *model.Product) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
@@ -4347,11 +4347,11 @@ func (ec *executionContext) marshalNProduct2ᚖmember_APIᚋgraphqlᚋmodelᚐPr
 	return ec._Product(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProductsResponse2member_APIᚋgraphqlᚋmodelᚐProductsResponse(ctx context.Context, sel ast.SelectionSet, v model.ProductsResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNProductsResponse2mantra_APIᚋgraphqlᚋmodelᚐProductsResponse(ctx context.Context, sel ast.SelectionSet, v model.ProductsResponse) graphql.Marshaler {
 	return ec._ProductsResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProductsResponse2ᚖmember_APIᚋgraphqlᚋmodelᚐProductsResponse(ctx context.Context, sel ast.SelectionSet, v *model.ProductsResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNProductsResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐProductsResponse(ctx context.Context, sel ast.SelectionSet, v *model.ProductsResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
@@ -4377,12 +4377,12 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdateMemberInput2member_APIᚋgraphqlᚋmodelᚐUpdateMemberInput(ctx context.Context, v any) (model.UpdateMemberInput, error) {
+func (ec *executionContext) unmarshalNUpdateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMemberInput(ctx context.Context, v any) (model.UpdateMemberInput, error) {
 	res, err := ec.unmarshalInputUpdateMemberInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateProductInput2member_APIᚋgraphqlᚋmodelᚐUpdateProductInput(ctx context.Context, v any) (model.UpdateProductInput, error) {
+func (ec *executionContext) unmarshalNUpdateProductInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateProductInput(ctx context.Context, v any) (model.UpdateProductInput, error) {
 	res, err := ec.unmarshalInputUpdateProductInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -4705,14 +4705,14 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalOMember2ᚖmember_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v *model.Member) graphql.Marshaler {
+func (ec *executionContext) marshalOMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v *model.Member) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Member(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOProduct2ᚖmember_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v *model.Product) graphql.Marshaler {
+func (ec *executionContext) marshalOProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v *model.Product) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

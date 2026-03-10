@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"member_API/services"
+	"mantra_API/services"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

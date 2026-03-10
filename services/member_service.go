@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"member_API/auth"
-	"member_API/models"
+	"mantra_API/auth"
+	"mantra_API/models"
 
 	"gorm.io/gorm"
 )

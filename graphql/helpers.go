@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"member_API/graphql/model"
-	"member_API/models"
+	"mantra_API/graphql/model"
+	"mantra_API/models"
 )
 
 // dbToModel converts DB Member to GraphQL model

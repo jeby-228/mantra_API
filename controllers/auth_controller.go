@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"member_API/auth"
-	"member_API/models"
-	"member_API/services"
+	"mantra_API/auth"
+	"mantra_API/models"
+	"mantra_API/services"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

@@ -8,9 +8,9 @@ package graphql
 import (
 	"context"
 	"fmt"
-	"member_API/graphql/model"
-	"member_API/models"
-	"member_API/services"
+	"mantra_API/graphql/model"
+	"mantra_API/models"
+	"mantra_API/services"
 	"strconv"
 )
 

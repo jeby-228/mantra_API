@@ -3,9 +3,9 @@ package routes
 import (
 	"net/http"
 
-	"member_API/auth"
-	"member_API/controllers"
-	"member_API/graphql"
+	"mantra_API/auth"
+	"mantra_API/controllers"
+	"mantra_API/graphql"
 
 	"github.com/gin-gonic/gin"
 )
