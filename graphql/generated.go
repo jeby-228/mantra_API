@@ -47,6 +47,43 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Mantra struct {
+		Content     func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
+	}
+
+	MantraDailyStat struct {
+		Count    func(childComplexity int) int
+		MantraID func(childComplexity int) int
+		StatDate func(childComplexity int) int
+	}
+
+	MantraRecord struct {
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Location  func(childComplexity int) int
+		MantraID  func(childComplexity int) int
+		SaidAt    func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+	}
+
+	MantraRecordsResponse struct {
+		Limit   func(childComplexity int) int
+		Offset  func(childComplexity int) int
+		Records func(childComplexity int) int
+		Total   func(childComplexity int) int
+	}
+
+	MantrasResponse struct {
+		Limit   func(childComplexity int) int
+		Mantras func(childComplexity int) int
+		Offset  func(childComplexity int) int
+		Total   func(childComplexity int) int
+	}
+
 	Member struct {
 		CreatedAt func(childComplexity int) int
 		Email     func(childComplexity int) int
@@ -55,13 +92,40 @@ type ComplexityRoot struct {
 		UpdatedAt func(childComplexity int) int
 	}
 
+	MessageBoard struct {
+		CreatedAt     func(childComplexity int) int
+		ID            func(childComplexity int) int
+		IsEdited      func(childComplexity int) int
+		Message       func(childComplexity int) int
+		QuoteRecordID func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+	}
+
+	MessageBoardsResponse struct {
+		Limit    func(childComplexity int) int
+		Messages func(childComplexity int) int
+		Offset   func(childComplexity int) int
+		Total    func(childComplexity int) int
+	}
+
 	Mutation struct {
-		CreateMember  func(childComplexity int, input model.CreateMemberInput) int
-		CreateProduct func(childComplexity int, input model.CreateProductInput) int
-		DeleteMember  func(childComplexity int, id string) int
-		DeleteProduct func(childComplexity int, id string) int
-		UpdateMember  func(childComplexity int, id string, input model.UpdateMemberInput) int
-		UpdateProduct func(childComplexity int, id string, input model.UpdateProductInput) int
+		CreateMantra       func(childComplexity int, input model.CreateMantraInput) int
+		CreateMantraRecord func(childComplexity int, input model.CreateMantraRecordInput) int
+		CreateMember       func(childComplexity int, input model.CreateMemberInput) int
+		CreateMessageBoard func(childComplexity int, input model.CreateMessageBoardInput) int
+		CreateProduct      func(childComplexity int, input model.CreateProductInput) int
+		CreateQuoteRecord  func(childComplexity int, input model.CreateQuoteRecordInput) int
+		DeleteMantra       func(childComplexity int, id string) int
+		DeleteMantraRecord func(childComplexity int, id string) int
+		DeleteMember       func(childComplexity int, id string) int
+		DeleteMessageBoard func(childComplexity int, id string) int
+		DeleteProduct      func(childComplexity int, id string) int
+		DeleteQuoteRecord  func(childComplexity int, id string) int
+		EditMessageBoard   func(childComplexity int, id string, input model.EditMessageBoardInput) int
+		UpdateMantra       func(childComplexity int, id string, input model.UpdateMantraInput) int
+		UpdateMember       func(childComplexity int, id string, input model.UpdateMemberInput) int
+		UpdateProduct      func(childComplexity int, id string, input model.UpdateProductInput) int
+		UpdateQuoteRecord  func(childComplexity int, id string, input model.UpdateQuoteRecordInput) int
 	}
 
 	Product struct {
@@ -83,10 +147,35 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Member   func(childComplexity int, id string) int
-		Members  func(childComplexity int, limit *int) int
-		Product  func(childComplexity int, id string) int
-		Products func(childComplexity int, limit *int, offset *int) int
+		Mantra           func(childComplexity int, id string) int
+		MantraDailyStats func(childComplexity int, mantraID string, days int) int
+		MantraRecord     func(childComplexity int, id string) int
+		MantraRecords    func(childComplexity int, mantraID *string, limit *int, offset *int) int
+		Mantras          func(childComplexity int, limit *int, offset *int) int
+		Member           func(childComplexity int, id string) int
+		Members          func(childComplexity int, limit *int) int
+		MessageBoard     func(childComplexity int, id string) int
+		MessageBoards    func(childComplexity int, quoteRecordID string, limit *int, offset *int) int
+		Product          func(childComplexity int, id string) int
+		Products         func(childComplexity int, limit *int, offset *int) int
+		QuoteRecord      func(childComplexity int, id string) int
+		QuoteRecords     func(childComplexity int, limit *int, offset *int) int
+	}
+
+	QuoteRecord struct {
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		JbName    func(childComplexity int) int
+		Quote     func(childComplexity int) int
+		SaidAt    func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+	}
+
+	QuoteRecordsResponse struct {
+		Limit   func(childComplexity int) int
+		Offset  func(childComplexity int) int
+		Records func(childComplexity int) int
+		Total   func(childComplexity int) int
 	}
 }
 
@@ -97,12 +186,32 @@ type MutationResolver interface {
 	CreateProduct(ctx context.Context, input model.CreateProductInput) (*model.Product, error)
 	UpdateProduct(ctx context.Context, id string, input model.UpdateProductInput) (*model.Product, error)
 	DeleteProduct(ctx context.Context, id string) (bool, error)
+	CreateMantra(ctx context.Context, input model.CreateMantraInput) (*model.Mantra, error)
+	UpdateMantra(ctx context.Context, id string, input model.UpdateMantraInput) (*model.Mantra, error)
+	DeleteMantra(ctx context.Context, id string) (bool, error)
+	CreateMantraRecord(ctx context.Context, input model.CreateMantraRecordInput) (*model.MantraRecord, error)
+	DeleteMantraRecord(ctx context.Context, id string) (bool, error)
+	CreateQuoteRecord(ctx context.Context, input model.CreateQuoteRecordInput) (*model.QuoteRecord, error)
+	UpdateQuoteRecord(ctx context.Context, id string, input model.UpdateQuoteRecordInput) (*model.QuoteRecord, error)
+	DeleteQuoteRecord(ctx context.Context, id string) (bool, error)
+	CreateMessageBoard(ctx context.Context, input model.CreateMessageBoardInput) (*model.MessageBoard, error)
+	EditMessageBoard(ctx context.Context, id string, input model.EditMessageBoardInput) (*model.MessageBoard, error)
+	DeleteMessageBoard(ctx context.Context, id string) (bool, error)
 }
 type QueryResolver interface {
 	Member(ctx context.Context, id string) (*model.Member, error)
 	Members(ctx context.Context, limit *int) ([]*model.Member, error)
 	Product(ctx context.Context, id string) (*model.Product, error)
 	Products(ctx context.Context, limit *int, offset *int) (*model.ProductsResponse, error)
+	Mantra(ctx context.Context, id string) (*model.Mantra, error)
+	Mantras(ctx context.Context, limit *int, offset *int) (*model.MantrasResponse, error)
+	MantraRecord(ctx context.Context, id string) (*model.MantraRecord, error)
+	MantraRecords(ctx context.Context, mantraID *string, limit *int, offset *int) (*model.MantraRecordsResponse, error)
+	MantraDailyStats(ctx context.Context, mantraID string, days int) ([]*model.MantraDailyStat, error)
+	QuoteRecord(ctx context.Context, id string) (*model.QuoteRecord, error)
+	QuoteRecords(ctx context.Context, limit *int, offset *int) (*model.QuoteRecordsResponse, error)
+	MessageBoard(ctx context.Context, id string) (*model.MessageBoard, error)
+	MessageBoards(ctx context.Context, quoteRecordID string, limit *int, offset *int) (*model.MessageBoardsResponse, error)
 }
 
 type executableSchema struct {
@@ -123,6 +232,143 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Mantra.content":
+		if e.complexity.Mantra.Content == nil {
+			break
+		}
+
+		return e.complexity.Mantra.Content(childComplexity), true
+	case "Mantra.created_at":
+		if e.complexity.Mantra.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Mantra.CreatedAt(childComplexity), true
+	case "Mantra.description":
+		if e.complexity.Mantra.Description == nil {
+			break
+		}
+
+		return e.complexity.Mantra.Description(childComplexity), true
+	case "Mantra.id":
+		if e.complexity.Mantra.ID == nil {
+			break
+		}
+
+		return e.complexity.Mantra.ID(childComplexity), true
+	case "Mantra.updated_at":
+		if e.complexity.Mantra.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Mantra.UpdatedAt(childComplexity), true
+
+	case "MantraDailyStat.count":
+		if e.complexity.MantraDailyStat.Count == nil {
+			break
+		}
+
+		return e.complexity.MantraDailyStat.Count(childComplexity), true
+	case "MantraDailyStat.mantra_id":
+		if e.complexity.MantraDailyStat.MantraID == nil {
+			break
+		}
+
+		return e.complexity.MantraDailyStat.MantraID(childComplexity), true
+	case "MantraDailyStat.stat_date":
+		if e.complexity.MantraDailyStat.StatDate == nil {
+			break
+		}
+
+		return e.complexity.MantraDailyStat.StatDate(childComplexity), true
+
+	case "MantraRecord.created_at":
+		if e.complexity.MantraRecord.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MantraRecord.CreatedAt(childComplexity), true
+	case "MantraRecord.id":
+		if e.complexity.MantraRecord.ID == nil {
+			break
+		}
+
+		return e.complexity.MantraRecord.ID(childComplexity), true
+	case "MantraRecord.location":
+		if e.complexity.MantraRecord.Location == nil {
+			break
+		}
+
+		return e.complexity.MantraRecord.Location(childComplexity), true
+	case "MantraRecord.mantra_id":
+		if e.complexity.MantraRecord.MantraID == nil {
+			break
+		}
+
+		return e.complexity.MantraRecord.MantraID(childComplexity), true
+	case "MantraRecord.said_at":
+		if e.complexity.MantraRecord.SaidAt == nil {
+			break
+		}
+
+		return e.complexity.MantraRecord.SaidAt(childComplexity), true
+	case "MantraRecord.updated_at":
+		if e.complexity.MantraRecord.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.MantraRecord.UpdatedAt(childComplexity), true
+
+	case "MantraRecordsResponse.limit":
+		if e.complexity.MantraRecordsResponse.Limit == nil {
+			break
+		}
+
+		return e.complexity.MantraRecordsResponse.Limit(childComplexity), true
+	case "MantraRecordsResponse.offset":
+		if e.complexity.MantraRecordsResponse.Offset == nil {
+			break
+		}
+
+		return e.complexity.MantraRecordsResponse.Offset(childComplexity), true
+	case "MantraRecordsResponse.records":
+		if e.complexity.MantraRecordsResponse.Records == nil {
+			break
+		}
+
+		return e.complexity.MantraRecordsResponse.Records(childComplexity), true
+	case "MantraRecordsResponse.total":
+		if e.complexity.MantraRecordsResponse.Total == nil {
+			break
+		}
+
+		return e.complexity.MantraRecordsResponse.Total(childComplexity), true
+
+	case "MantrasResponse.limit":
+		if e.complexity.MantrasResponse.Limit == nil {
+			break
+		}
+
+		return e.complexity.MantrasResponse.Limit(childComplexity), true
+	case "MantrasResponse.mantras":
+		if e.complexity.MantrasResponse.Mantras == nil {
+			break
+		}
+
+		return e.complexity.MantrasResponse.Mantras(childComplexity), true
+	case "MantrasResponse.offset":
+		if e.complexity.MantrasResponse.Offset == nil {
+			break
+		}
+
+		return e.complexity.MantrasResponse.Offset(childComplexity), true
+	case "MantrasResponse.total":
+		if e.complexity.MantrasResponse.Total == nil {
+			break
+		}
+
+		return e.complexity.MantrasResponse.Total(childComplexity), true
 
 	case "Member.created_at":
 		if e.complexity.Member.CreatedAt == nil {
@@ -155,6 +401,90 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Member.UpdatedAt(childComplexity), true
 
+	case "MessageBoard.created_at":
+		if e.complexity.MessageBoard.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MessageBoard.CreatedAt(childComplexity), true
+	case "MessageBoard.id":
+		if e.complexity.MessageBoard.ID == nil {
+			break
+		}
+
+		return e.complexity.MessageBoard.ID(childComplexity), true
+	case "MessageBoard.is_edited":
+		if e.complexity.MessageBoard.IsEdited == nil {
+			break
+		}
+
+		return e.complexity.MessageBoard.IsEdited(childComplexity), true
+	case "MessageBoard.message":
+		if e.complexity.MessageBoard.Message == nil {
+			break
+		}
+
+		return e.complexity.MessageBoard.Message(childComplexity), true
+	case "MessageBoard.quote_record_id":
+		if e.complexity.MessageBoard.QuoteRecordID == nil {
+			break
+		}
+
+		return e.complexity.MessageBoard.QuoteRecordID(childComplexity), true
+	case "MessageBoard.updated_at":
+		if e.complexity.MessageBoard.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.MessageBoard.UpdatedAt(childComplexity), true
+
+	case "MessageBoardsResponse.limit":
+		if e.complexity.MessageBoardsResponse.Limit == nil {
+			break
+		}
+
+		return e.complexity.MessageBoardsResponse.Limit(childComplexity), true
+	case "MessageBoardsResponse.messages":
+		if e.complexity.MessageBoardsResponse.Messages == nil {
+			break
+		}
+
+		return e.complexity.MessageBoardsResponse.Messages(childComplexity), true
+	case "MessageBoardsResponse.offset":
+		if e.complexity.MessageBoardsResponse.Offset == nil {
+			break
+		}
+
+		return e.complexity.MessageBoardsResponse.Offset(childComplexity), true
+	case "MessageBoardsResponse.total":
+		if e.complexity.MessageBoardsResponse.Total == nil {
+			break
+		}
+
+		return e.complexity.MessageBoardsResponse.Total(childComplexity), true
+
+	case "Mutation.createMantra":
+		if e.complexity.Mutation.CreateMantra == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMantra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMantra(childComplexity, args["input"].(model.CreateMantraInput)), true
+	case "Mutation.createMantraRecord":
+		if e.complexity.Mutation.CreateMantraRecord == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMantraRecord_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMantraRecord(childComplexity, args["input"].(model.CreateMantraRecordInput)), true
 	case "Mutation.createMember":
 		if e.complexity.Mutation.CreateMember == nil {
 			break
@@ -166,6 +496,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateMember(childComplexity, args["input"].(model.CreateMemberInput)), true
+	case "Mutation.createMessageBoard":
+		if e.complexity.Mutation.CreateMessageBoard == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMessageBoard_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMessageBoard(childComplexity, args["input"].(model.CreateMessageBoardInput)), true
 	case "Mutation.createProduct":
 		if e.complexity.Mutation.CreateProduct == nil {
 			break
@@ -177,6 +518,39 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateProduct(childComplexity, args["input"].(model.CreateProductInput)), true
+	case "Mutation.createQuoteRecord":
+		if e.complexity.Mutation.CreateQuoteRecord == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createQuoteRecord_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateQuoteRecord(childComplexity, args["input"].(model.CreateQuoteRecordInput)), true
+	case "Mutation.deleteMantra":
+		if e.complexity.Mutation.DeleteMantra == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMantra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMantra(childComplexity, args["id"].(string)), true
+	case "Mutation.deleteMantraRecord":
+		if e.complexity.Mutation.DeleteMantraRecord == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMantraRecord_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMantraRecord(childComplexity, args["id"].(string)), true
 	case "Mutation.deleteMember":
 		if e.complexity.Mutation.DeleteMember == nil {
 			break
@@ -188,6 +562,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteMember(childComplexity, args["id"].(string)), true
+	case "Mutation.deleteMessageBoard":
+		if e.complexity.Mutation.DeleteMessageBoard == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMessageBoard_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMessageBoard(childComplexity, args["id"].(string)), true
 	case "Mutation.deleteProduct":
 		if e.complexity.Mutation.DeleteProduct == nil {
 			break
@@ -199,6 +584,39 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteProduct(childComplexity, args["id"].(string)), true
+	case "Mutation.deleteQuoteRecord":
+		if e.complexity.Mutation.DeleteQuoteRecord == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteQuoteRecord_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteQuoteRecord(childComplexity, args["id"].(string)), true
+	case "Mutation.editMessageBoard":
+		if e.complexity.Mutation.EditMessageBoard == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_editMessageBoard_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EditMessageBoard(childComplexity, args["id"].(string), args["input"].(model.EditMessageBoardInput)), true
+	case "Mutation.updateMantra":
+		if e.complexity.Mutation.UpdateMantra == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateMantra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateMantra(childComplexity, args["id"].(string), args["input"].(model.UpdateMantraInput)), true
 	case "Mutation.updateMember":
 		if e.complexity.Mutation.UpdateMember == nil {
 			break
@@ -221,6 +639,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateProduct(childComplexity, args["id"].(string), args["input"].(model.UpdateProductInput)), true
+	case "Mutation.updateQuoteRecord":
+		if e.complexity.Mutation.UpdateQuoteRecord == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateQuoteRecord_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateQuoteRecord(childComplexity, args["id"].(string), args["input"].(model.UpdateQuoteRecordInput)), true
 
 	case "Product.created_at":
 		if e.complexity.Product.CreatedAt == nil {
@@ -296,6 +725,61 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ProductsResponse.Total(childComplexity), true
 
+	case "Query.mantra":
+		if e.complexity.Query.Mantra == nil {
+			break
+		}
+
+		args, err := ec.field_Query_mantra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Mantra(childComplexity, args["id"].(string)), true
+	case "Query.mantraDailyStats":
+		if e.complexity.Query.MantraDailyStats == nil {
+			break
+		}
+
+		args, err := ec.field_Query_mantraDailyStats_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MantraDailyStats(childComplexity, args["mantra_id"].(string), args["days"].(int)), true
+	case "Query.mantraRecord":
+		if e.complexity.Query.MantraRecord == nil {
+			break
+		}
+
+		args, err := ec.field_Query_mantraRecord_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MantraRecord(childComplexity, args["id"].(string)), true
+	case "Query.mantraRecords":
+		if e.complexity.Query.MantraRecords == nil {
+			break
+		}
+
+		args, err := ec.field_Query_mantraRecords_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MantraRecords(childComplexity, args["mantra_id"].(*string), args["limit"].(*int), args["offset"].(*int)), true
+	case "Query.mantras":
+		if e.complexity.Query.Mantras == nil {
+			break
+		}
+
+		args, err := ec.field_Query_mantras_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Mantras(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
 	case "Query.member":
 		if e.complexity.Query.Member == nil {
 			break
@@ -318,6 +802,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Members(childComplexity, args["limit"].(*int)), true
+	case "Query.messageBoard":
+		if e.complexity.Query.MessageBoard == nil {
+			break
+		}
+
+		args, err := ec.field_Query_messageBoard_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MessageBoard(childComplexity, args["id"].(string)), true
+	case "Query.messageBoards":
+		if e.complexity.Query.MessageBoards == nil {
+			break
+		}
+
+		args, err := ec.field_Query_messageBoards_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MessageBoards(childComplexity, args["quote_record_id"].(string), args["limit"].(*int), args["offset"].(*int)), true
 	case "Query.product":
 		if e.complexity.Query.Product == nil {
 			break
@@ -340,6 +846,90 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Products(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+	case "Query.quoteRecord":
+		if e.complexity.Query.QuoteRecord == nil {
+			break
+		}
+
+		args, err := ec.field_Query_quoteRecord_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QuoteRecord(childComplexity, args["id"].(string)), true
+	case "Query.quoteRecords":
+		if e.complexity.Query.QuoteRecords == nil {
+			break
+		}
+
+		args, err := ec.field_Query_quoteRecords_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QuoteRecords(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+
+	case "QuoteRecord.created_at":
+		if e.complexity.QuoteRecord.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecord.CreatedAt(childComplexity), true
+	case "QuoteRecord.id":
+		if e.complexity.QuoteRecord.ID == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecord.ID(childComplexity), true
+	case "QuoteRecord.jb_name":
+		if e.complexity.QuoteRecord.JbName == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecord.JbName(childComplexity), true
+	case "QuoteRecord.quote":
+		if e.complexity.QuoteRecord.Quote == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecord.Quote(childComplexity), true
+	case "QuoteRecord.said_at":
+		if e.complexity.QuoteRecord.SaidAt == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecord.SaidAt(childComplexity), true
+	case "QuoteRecord.updated_at":
+		if e.complexity.QuoteRecord.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecord.UpdatedAt(childComplexity), true
+
+	case "QuoteRecordsResponse.limit":
+		if e.complexity.QuoteRecordsResponse.Limit == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecordsResponse.Limit(childComplexity), true
+	case "QuoteRecordsResponse.offset":
+		if e.complexity.QuoteRecordsResponse.Offset == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecordsResponse.Offset(childComplexity), true
+	case "QuoteRecordsResponse.records":
+		if e.complexity.QuoteRecordsResponse.Records == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecordsResponse.Records(childComplexity), true
+	case "QuoteRecordsResponse.total":
+		if e.complexity.QuoteRecordsResponse.Total == nil {
+			break
+		}
+
+		return e.complexity.QuoteRecordsResponse.Total(childComplexity), true
 
 	}
 	return 0, false
@@ -349,10 +939,17 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputCreateMantraInput,
+		ec.unmarshalInputCreateMantraRecordInput,
 		ec.unmarshalInputCreateMemberInput,
+		ec.unmarshalInputCreateMessageBoardInput,
 		ec.unmarshalInputCreateProductInput,
+		ec.unmarshalInputCreateQuoteRecordInput,
+		ec.unmarshalInputEditMessageBoardInput,
+		ec.unmarshalInputUpdateMantraInput,
 		ec.unmarshalInputUpdateMemberInput,
 		ec.unmarshalInputUpdateProductInput,
+		ec.unmarshalInputUpdateQuoteRecordInput,
 	)
 	first := true
 
@@ -469,10 +1066,43 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_createMantraRecord_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateMantraRecordInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMantraRecordInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createMantra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateMantraInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMantraInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMemberInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createMessageBoard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateMessageBoardInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMessageBoardInput)
 	if err != nil {
 		return nil, err
 	}
@@ -491,7 +1121,51 @@ func (ec *executionContext) field_Mutation_createProduct_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createQuoteRecord_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateQuoteRecordInput2mantra_APIᚋgraphqlᚋmodelᚐCreateQuoteRecordInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteMantraRecord_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteMantra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteMessageBoard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
@@ -510,6 +1184,49 @@ func (ec *executionContext) field_Mutation_deleteProduct_args(ctx context.Contex
 		return nil, err
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteQuoteRecord_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_editMessageBoard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNEditMessageBoardInput2mantra_APIᚋgraphqlᚋmodelᚐEditMessageBoardInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateMantra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateMantraInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMantraInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -545,6 +1262,22 @@ func (ec *executionContext) field_Mutation_updateProduct_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateQuoteRecord_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateQuoteRecordInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateQuoteRecordInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -553,6 +1286,81 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_mantraDailyStats_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "mantra_id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["mantra_id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "days", ec.unmarshalNInt2int)
+	if err != nil {
+		return nil, err
+	}
+	args["days"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_mantraRecord_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_mantraRecords_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "mantra_id", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["mantra_id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_mantra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_mantras_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg1
 	return args, nil
 }
 
@@ -578,6 +1386,38 @@ func (ec *executionContext) field_Query_members_args(ctx context.Context, rawArg
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_messageBoard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_messageBoards_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "quote_record_id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["quote_record_id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_product_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -590,6 +1430,33 @@ func (ec *executionContext) field_Query_product_args(ctx context.Context, rawArg
 }
 
 func (ec *executionContext) field_Query_products_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_quoteRecord_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_quoteRecords_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint)
@@ -656,6 +1523,670 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Mantra_id(ctx context.Context, field graphql.CollectedField, obj *model.Mantra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mantra_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mantra_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mantra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mantra_content(ctx context.Context, field graphql.CollectedField, obj *model.Mantra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mantra_content,
+		func(ctx context.Context) (any, error) {
+			return obj.Content, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mantra_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mantra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mantra_description(ctx context.Context, field graphql.CollectedField, obj *model.Mantra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mantra_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mantra_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mantra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mantra_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Mantra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mantra_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mantra_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mantra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mantra_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Mantra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mantra_updated_at,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mantra_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mantra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraDailyStat_mantra_id(ctx context.Context, field graphql.CollectedField, obj *model.MantraDailyStat) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraDailyStat_mantra_id,
+		func(ctx context.Context) (any, error) {
+			return obj.MantraID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraDailyStat_mantra_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraDailyStat",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraDailyStat_stat_date(ctx context.Context, field graphql.CollectedField, obj *model.MantraDailyStat) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraDailyStat_stat_date,
+		func(ctx context.Context) (any, error) {
+			return obj.StatDate, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraDailyStat_stat_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraDailyStat",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraDailyStat_count(ctx context.Context, field graphql.CollectedField, obj *model.MantraDailyStat) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraDailyStat_count,
+		func(ctx context.Context) (any, error) {
+			return obj.Count, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraDailyStat_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraDailyStat",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecord_id(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecord_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecord_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecord_mantra_id(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecord_mantra_id,
+		func(ctx context.Context) (any, error) {
+			return obj.MantraID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecord_mantra_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecord_location(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecord_location,
+		func(ctx context.Context) (any, error) {
+			return obj.Location, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecord_location(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecord_said_at(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecord_said_at,
+		func(ctx context.Context) (any, error) {
+			return obj.SaidAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecord_said_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecord_created_at(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecord_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecord_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecord_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecord_updated_at,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecord_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecordsResponse_records(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecordsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecordsResponse_records,
+		func(ctx context.Context) (any, error) {
+			return obj.Records, nil
+		},
+		nil,
+		ec.marshalNMantraRecord2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecordᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecordsResponse_records(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecordsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MantraRecord_id(ctx, field)
+			case "mantra_id":
+				return ec.fieldContext_MantraRecord_mantra_id(ctx, field)
+			case "location":
+				return ec.fieldContext_MantraRecord_location(ctx, field)
+			case "said_at":
+				return ec.fieldContext_MantraRecord_said_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_MantraRecord_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_MantraRecord_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MantraRecord", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecordsResponse_total(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecordsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecordsResponse_total,
+		func(ctx context.Context) (any, error) {
+			return obj.Total, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecordsResponse_total(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecordsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecordsResponse_limit(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecordsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecordsResponse_limit,
+		func(ctx context.Context) (any, error) {
+			return obj.Limit, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecordsResponse_limit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecordsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantraRecordsResponse_offset(ctx context.Context, field graphql.CollectedField, obj *model.MantraRecordsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantraRecordsResponse_offset,
+		func(ctx context.Context) (any, error) {
+			return obj.Offset, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantraRecordsResponse_offset(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantraRecordsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantrasResponse_mantras(ctx context.Context, field graphql.CollectedField, obj *model.MantrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantrasResponse_mantras,
+		func(ctx context.Context) (any, error) {
+			return obj.Mantras, nil
+		},
+		nil,
+		ec.marshalNMantra2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMantraᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantrasResponse_mantras(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Mantra_id(ctx, field)
+			case "content":
+				return ec.fieldContext_Mantra_content(ctx, field)
+			case "description":
+				return ec.fieldContext_Mantra_description(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Mantra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Mantra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Mantra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantrasResponse_total(ctx context.Context, field graphql.CollectedField, obj *model.MantrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantrasResponse_total,
+		func(ctx context.Context) (any, error) {
+			return obj.Total, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantrasResponse_total(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantrasResponse_limit(ctx context.Context, field graphql.CollectedField, obj *model.MantrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantrasResponse_limit,
+		func(ctx context.Context) (any, error) {
+			return obj.Limit, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantrasResponse_limit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MantrasResponse_offset(ctx context.Context, field graphql.CollectedField, obj *model.MantrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MantrasResponse_offset,
+		func(ctx context.Context) (any, error) {
+			return obj.Offset, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MantrasResponse_offset(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MantrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Member_id(ctx context.Context, field graphql.CollectedField, obj *model.Member) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
@@ -797,6 +2328,310 @@ func (ec *executionContext) fieldContext_Member_updated_at(_ context.Context, fi
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoard_id(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoard_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoard_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoard_message(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoard_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoard_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoard_quote_record_id(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoard_quote_record_id,
+		func(ctx context.Context) (any, error) {
+			return obj.QuoteRecordID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoard_quote_record_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoard_is_edited(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoard_is_edited,
+		func(ctx context.Context) (any, error) {
+			return obj.IsEdited, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoard_is_edited(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoard_created_at(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoard_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoard_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoard_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoard) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoard_updated_at,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoard_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoard",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoardsResponse_messages(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoardsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoardsResponse_messages,
+		func(ctx context.Context) (any, error) {
+			return obj.Messages, nil
+		},
+		nil,
+		ec.marshalNMessageBoard2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoardᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoardsResponse_messages(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoardsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MessageBoard_id(ctx, field)
+			case "message":
+				return ec.fieldContext_MessageBoard_message(ctx, field)
+			case "quote_record_id":
+				return ec.fieldContext_MessageBoard_quote_record_id(ctx, field)
+			case "is_edited":
+				return ec.fieldContext_MessageBoard_is_edited(ctx, field)
+			case "created_at":
+				return ec.fieldContext_MessageBoard_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_MessageBoard_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MessageBoard", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoardsResponse_total(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoardsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoardsResponse_total,
+		func(ctx context.Context) (any, error) {
+			return obj.Total, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoardsResponse_total(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoardsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoardsResponse_limit(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoardsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoardsResponse_limit,
+		func(ctx context.Context) (any, error) {
+			return obj.Limit, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoardsResponse_limit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoardsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageBoardsResponse_offset(ctx context.Context, field graphql.CollectedField, obj *model.MessageBoardsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MessageBoardsResponse_offset,
+		func(ctx context.Context) (any, error) {
+			return obj.Offset, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MessageBoardsResponse_offset(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageBoardsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1102,6 +2937,551 @@ func (ec *executionContext) fieldContext_Mutation_deleteProduct(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteProduct_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createMantra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createMantra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateMantra(ctx, fc.Args["input"].(model.CreateMantraInput))
+		},
+		nil,
+		ec.marshalNMantra2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantra,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createMantra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Mantra_id(ctx, field)
+			case "content":
+				return ec.fieldContext_Mantra_content(ctx, field)
+			case "description":
+				return ec.fieldContext_Mantra_description(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Mantra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Mantra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Mantra", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createMantra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateMantra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateMantra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateMantra(ctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateMantraInput))
+		},
+		nil,
+		ec.marshalNMantra2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantra,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateMantra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Mantra_id(ctx, field)
+			case "content":
+				return ec.fieldContext_Mantra_content(ctx, field)
+			case "description":
+				return ec.fieldContext_Mantra_description(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Mantra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Mantra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Mantra", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateMantra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMantra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteMantra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteMantra(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteMantra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMantra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createMantraRecord(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createMantraRecord,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateMantraRecord(ctx, fc.Args["input"].(model.CreateMantraRecordInput))
+		},
+		nil,
+		ec.marshalNMantraRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecord,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createMantraRecord(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MantraRecord_id(ctx, field)
+			case "mantra_id":
+				return ec.fieldContext_MantraRecord_mantra_id(ctx, field)
+			case "location":
+				return ec.fieldContext_MantraRecord_location(ctx, field)
+			case "said_at":
+				return ec.fieldContext_MantraRecord_said_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_MantraRecord_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_MantraRecord_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MantraRecord", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createMantraRecord_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMantraRecord(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteMantraRecord,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteMantraRecord(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteMantraRecord(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMantraRecord_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createQuoteRecord(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createQuoteRecord,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateQuoteRecord(ctx, fc.Args["input"].(model.CreateQuoteRecordInput))
+		},
+		nil,
+		ec.marshalNQuoteRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecord,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createQuoteRecord(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_QuoteRecord_id(ctx, field)
+			case "jb_name":
+				return ec.fieldContext_QuoteRecord_jb_name(ctx, field)
+			case "quote":
+				return ec.fieldContext_QuoteRecord_quote(ctx, field)
+			case "said_at":
+				return ec.fieldContext_QuoteRecord_said_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_QuoteRecord_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_QuoteRecord_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type QuoteRecord", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createQuoteRecord_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateQuoteRecord(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateQuoteRecord,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateQuoteRecord(ctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateQuoteRecordInput))
+		},
+		nil,
+		ec.marshalNQuoteRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecord,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateQuoteRecord(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_QuoteRecord_id(ctx, field)
+			case "jb_name":
+				return ec.fieldContext_QuoteRecord_jb_name(ctx, field)
+			case "quote":
+				return ec.fieldContext_QuoteRecord_quote(ctx, field)
+			case "said_at":
+				return ec.fieldContext_QuoteRecord_said_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_QuoteRecord_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_QuoteRecord_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type QuoteRecord", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateQuoteRecord_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteQuoteRecord(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteQuoteRecord,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteQuoteRecord(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteQuoteRecord(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteQuoteRecord_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createMessageBoard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createMessageBoard,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateMessageBoard(ctx, fc.Args["input"].(model.CreateMessageBoardInput))
+		},
+		nil,
+		ec.marshalNMessageBoard2ᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoard,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createMessageBoard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MessageBoard_id(ctx, field)
+			case "message":
+				return ec.fieldContext_MessageBoard_message(ctx, field)
+			case "quote_record_id":
+				return ec.fieldContext_MessageBoard_quote_record_id(ctx, field)
+			case "is_edited":
+				return ec.fieldContext_MessageBoard_is_edited(ctx, field)
+			case "created_at":
+				return ec.fieldContext_MessageBoard_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_MessageBoard_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MessageBoard", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createMessageBoard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_editMessageBoard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_editMessageBoard,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().EditMessageBoard(ctx, fc.Args["id"].(string), fc.Args["input"].(model.EditMessageBoardInput))
+		},
+		nil,
+		ec.marshalNMessageBoard2ᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoard,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_editMessageBoard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MessageBoard_id(ctx, field)
+			case "message":
+				return ec.fieldContext_MessageBoard_message(ctx, field)
+			case "quote_record_id":
+				return ec.fieldContext_MessageBoard_quote_record_id(ctx, field)
+			case "is_edited":
+				return ec.fieldContext_MessageBoard_is_edited(ctx, field)
+			case "created_at":
+				return ec.fieldContext_MessageBoard_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_MessageBoard_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MessageBoard", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_editMessageBoard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMessageBoard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteMessageBoard,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteMessageBoard(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteMessageBoard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMessageBoard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1690,6 +4070,477 @@ func (ec *executionContext) fieldContext_Query_products(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_mantra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_mantra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Mantra(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalOMantra2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_mantra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Mantra_id(ctx, field)
+			case "content":
+				return ec.fieldContext_Mantra_content(ctx, field)
+			case "description":
+				return ec.fieldContext_Mantra_description(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Mantra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Mantra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Mantra", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_mantra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_mantras(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_mantras,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Mantras(ctx, fc.Args["limit"].(*int), fc.Args["offset"].(*int))
+		},
+		nil,
+		ec.marshalNMantrasResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantrasResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_mantras(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "mantras":
+				return ec.fieldContext_MantrasResponse_mantras(ctx, field)
+			case "total":
+				return ec.fieldContext_MantrasResponse_total(ctx, field)
+			case "limit":
+				return ec.fieldContext_MantrasResponse_limit(ctx, field)
+			case "offset":
+				return ec.fieldContext_MantrasResponse_offset(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MantrasResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_mantras_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_mantraRecord(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_mantraRecord,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().MantraRecord(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalOMantraRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecord,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_mantraRecord(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MantraRecord_id(ctx, field)
+			case "mantra_id":
+				return ec.fieldContext_MantraRecord_mantra_id(ctx, field)
+			case "location":
+				return ec.fieldContext_MantraRecord_location(ctx, field)
+			case "said_at":
+				return ec.fieldContext_MantraRecord_said_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_MantraRecord_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_MantraRecord_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MantraRecord", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_mantraRecord_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_mantraRecords(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_mantraRecords,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().MantraRecords(ctx, fc.Args["mantra_id"].(*string), fc.Args["limit"].(*int), fc.Args["offset"].(*int))
+		},
+		nil,
+		ec.marshalNMantraRecordsResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecordsResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_mantraRecords(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "records":
+				return ec.fieldContext_MantraRecordsResponse_records(ctx, field)
+			case "total":
+				return ec.fieldContext_MantraRecordsResponse_total(ctx, field)
+			case "limit":
+				return ec.fieldContext_MantraRecordsResponse_limit(ctx, field)
+			case "offset":
+				return ec.fieldContext_MantraRecordsResponse_offset(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MantraRecordsResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_mantraRecords_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_mantraDailyStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_mantraDailyStats,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().MantraDailyStats(ctx, fc.Args["mantra_id"].(string), fc.Args["days"].(int))
+		},
+		nil,
+		ec.marshalNMantraDailyStat2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMantraDailyStatᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_mantraDailyStats(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "mantra_id":
+				return ec.fieldContext_MantraDailyStat_mantra_id(ctx, field)
+			case "stat_date":
+				return ec.fieldContext_MantraDailyStat_stat_date(ctx, field)
+			case "count":
+				return ec.fieldContext_MantraDailyStat_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MantraDailyStat", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_mantraDailyStats_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_quoteRecord(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_quoteRecord,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().QuoteRecord(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalOQuoteRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecord,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_quoteRecord(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_QuoteRecord_id(ctx, field)
+			case "jb_name":
+				return ec.fieldContext_QuoteRecord_jb_name(ctx, field)
+			case "quote":
+				return ec.fieldContext_QuoteRecord_quote(ctx, field)
+			case "said_at":
+				return ec.fieldContext_QuoteRecord_said_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_QuoteRecord_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_QuoteRecord_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type QuoteRecord", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_quoteRecord_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_quoteRecords(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_quoteRecords,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().QuoteRecords(ctx, fc.Args["limit"].(*int), fc.Args["offset"].(*int))
+		},
+		nil,
+		ec.marshalNQuoteRecordsResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecordsResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_quoteRecords(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "records":
+				return ec.fieldContext_QuoteRecordsResponse_records(ctx, field)
+			case "total":
+				return ec.fieldContext_QuoteRecordsResponse_total(ctx, field)
+			case "limit":
+				return ec.fieldContext_QuoteRecordsResponse_limit(ctx, field)
+			case "offset":
+				return ec.fieldContext_QuoteRecordsResponse_offset(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type QuoteRecordsResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_quoteRecords_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_messageBoard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_messageBoard,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().MessageBoard(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalOMessageBoard2ᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoard,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_messageBoard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MessageBoard_id(ctx, field)
+			case "message":
+				return ec.fieldContext_MessageBoard_message(ctx, field)
+			case "quote_record_id":
+				return ec.fieldContext_MessageBoard_quote_record_id(ctx, field)
+			case "is_edited":
+				return ec.fieldContext_MessageBoard_is_edited(ctx, field)
+			case "created_at":
+				return ec.fieldContext_MessageBoard_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_MessageBoard_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MessageBoard", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_messageBoard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_messageBoards(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_messageBoards,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().MessageBoards(ctx, fc.Args["quote_record_id"].(string), fc.Args["limit"].(*int), fc.Args["offset"].(*int))
+		},
+		nil,
+		ec.marshalNMessageBoardsResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoardsResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_messageBoards(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "messages":
+				return ec.fieldContext_MessageBoardsResponse_messages(ctx, field)
+			case "total":
+				return ec.fieldContext_MessageBoardsResponse_total(ctx, field)
+			case "limit":
+				return ec.fieldContext_MessageBoardsResponse_limit(ctx, field)
+			case "offset":
+				return ec.fieldContext_MessageBoardsResponse_offset(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MessageBoardsResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_messageBoards_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1793,6 +4644,310 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecord_id(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecord_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecord_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecord_jb_name(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecord_jb_name,
+		func(ctx context.Context) (any, error) {
+			return obj.JbName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecord_jb_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecord_quote(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecord_quote,
+		func(ctx context.Context) (any, error) {
+			return obj.Quote, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecord_quote(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecord_said_at(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecord_said_at,
+		func(ctx context.Context) (any, error) {
+			return obj.SaidAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecord_said_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecord_created_at(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecord_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecord_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecord_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecord) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecord_updated_at,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecord_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecord",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecordsResponse_records(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecordsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecordsResponse_records,
+		func(ctx context.Context) (any, error) {
+			return obj.Records, nil
+		},
+		nil,
+		ec.marshalNQuoteRecord2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecordᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecordsResponse_records(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecordsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_QuoteRecord_id(ctx, field)
+			case "jb_name":
+				return ec.fieldContext_QuoteRecord_jb_name(ctx, field)
+			case "quote":
+				return ec.fieldContext_QuoteRecord_quote(ctx, field)
+			case "said_at":
+				return ec.fieldContext_QuoteRecord_said_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_QuoteRecord_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_QuoteRecord_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type QuoteRecord", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecordsResponse_total(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecordsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecordsResponse_total,
+		func(ctx context.Context) (any, error) {
+			return obj.Total, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecordsResponse_total(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecordsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecordsResponse_limit(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecordsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecordsResponse_limit,
+		func(ctx context.Context) (any, error) {
+			return obj.Limit, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecordsResponse_limit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecordsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuoteRecordsResponse_offset(ctx context.Context, field graphql.CollectedField, obj *model.QuoteRecordsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_QuoteRecordsResponse_offset,
+		func(ctx context.Context) (any, error) {
+			return obj.Offset, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_QuoteRecordsResponse_offset(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuoteRecordsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3244,6 +6399,81 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateMantraInput(ctx context.Context, obj any) (model.CreateMantraInput, error) {
+	var it model.CreateMantraInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"content", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateMantraRecordInput(ctx context.Context, obj any) (model.CreateMantraRecordInput, error) {
+	var it model.CreateMantraRecordInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"mantra_id", "location", "said_at"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "mantra_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mantra_id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MantraID = data
+		case "location":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Location = data
+		case "said_at":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("said_at"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SaidAt = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateMemberInput(ctx context.Context, obj any) (model.CreateMemberInput, error) {
 	var it model.CreateMemberInput
 	asMap := map[string]any{}
@@ -3279,6 +6509,40 @@ func (ec *executionContext) unmarshalInputCreateMemberInput(ctx context.Context,
 				return it, err
 			}
 			it.Password = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateMessageBoardInput(ctx context.Context, obj any) (model.CreateMessageBoardInput, error) {
+	var it model.CreateMessageBoardInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"quote_record_id", "message"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "quote_record_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quote_record_id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.QuoteRecordID = data
+		case "message":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Message = data
 		}
 	}
 
@@ -3334,6 +6598,108 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 				return it, err
 			}
 			it.ProductStock = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateQuoteRecordInput(ctx context.Context, obj any) (model.CreateQuoteRecordInput, error) {
+	var it model.CreateQuoteRecordInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"jb_name", "quote", "said_at"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "jb_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("jb_name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.JbName = data
+		case "quote":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quote"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quote = data
+		case "said_at":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("said_at"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SaidAt = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEditMessageBoardInput(ctx context.Context, obj any) (model.EditMessageBoardInput, error) {
+	var it model.EditMessageBoardInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"message"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "message":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Message = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateMantraInput(ctx context.Context, obj any) (model.UpdateMantraInput, error) {
+	var it model.UpdateMantraInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"content", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
 		}
 	}
 
@@ -3429,6 +6795,47 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateQuoteRecordInput(ctx context.Context, obj any) (model.UpdateQuoteRecordInput, error) {
+	var it model.UpdateQuoteRecordInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"jb_name", "quote", "said_at"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "jb_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("jb_name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.JbName = data
+		case "quote":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quote"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quote = data
+		case "said_at":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("said_at"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SaidAt = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3436,6 +6843,265 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var mantraImplementors = []string{"Mantra"}
+
+func (ec *executionContext) _Mantra(ctx context.Context, sel ast.SelectionSet, obj *model.Mantra) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mantraImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mantra")
+		case "id":
+			out.Values[i] = ec._Mantra_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "content":
+			out.Values[i] = ec._Mantra_content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Mantra_description(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._Mantra_created_at(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._Mantra_updated_at(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mantraDailyStatImplementors = []string{"MantraDailyStat"}
+
+func (ec *executionContext) _MantraDailyStat(ctx context.Context, sel ast.SelectionSet, obj *model.MantraDailyStat) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mantraDailyStatImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MantraDailyStat")
+		case "mantra_id":
+			out.Values[i] = ec._MantraDailyStat_mantra_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "stat_date":
+			out.Values[i] = ec._MantraDailyStat_stat_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "count":
+			out.Values[i] = ec._MantraDailyStat_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mantraRecordImplementors = []string{"MantraRecord"}
+
+func (ec *executionContext) _MantraRecord(ctx context.Context, sel ast.SelectionSet, obj *model.MantraRecord) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mantraRecordImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MantraRecord")
+		case "id":
+			out.Values[i] = ec._MantraRecord_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "mantra_id":
+			out.Values[i] = ec._MantraRecord_mantra_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "location":
+			out.Values[i] = ec._MantraRecord_location(ctx, field, obj)
+		case "said_at":
+			out.Values[i] = ec._MantraRecord_said_at(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._MantraRecord_created_at(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._MantraRecord_updated_at(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mantraRecordsResponseImplementors = []string{"MantraRecordsResponse"}
+
+func (ec *executionContext) _MantraRecordsResponse(ctx context.Context, sel ast.SelectionSet, obj *model.MantraRecordsResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mantraRecordsResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MantraRecordsResponse")
+		case "records":
+			out.Values[i] = ec._MantraRecordsResponse_records(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total":
+			out.Values[i] = ec._MantraRecordsResponse_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "limit":
+			out.Values[i] = ec._MantraRecordsResponse_limit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "offset":
+			out.Values[i] = ec._MantraRecordsResponse_offset(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mantrasResponseImplementors = []string{"MantrasResponse"}
+
+func (ec *executionContext) _MantrasResponse(ctx context.Context, sel ast.SelectionSet, obj *model.MantrasResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mantrasResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MantrasResponse")
+		case "mantras":
+			out.Values[i] = ec._MantrasResponse_mantras(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total":
+			out.Values[i] = ec._MantrasResponse_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "limit":
+			out.Values[i] = ec._MantrasResponse_limit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "offset":
+			out.Values[i] = ec._MantrasResponse_offset(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var memberImplementors = []string{"Member"}
 
@@ -3467,6 +7133,118 @@ func (ec *executionContext) _Member(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Member_created_at(ctx, field, obj)
 		case "updated_at":
 			out.Values[i] = ec._Member_updated_at(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var messageBoardImplementors = []string{"MessageBoard"}
+
+func (ec *executionContext) _MessageBoard(ctx context.Context, sel ast.SelectionSet, obj *model.MessageBoard) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, messageBoardImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MessageBoard")
+		case "id":
+			out.Values[i] = ec._MessageBoard_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._MessageBoard_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "quote_record_id":
+			out.Values[i] = ec._MessageBoard_quote_record_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "is_edited":
+			out.Values[i] = ec._MessageBoard_is_edited(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "created_at":
+			out.Values[i] = ec._MessageBoard_created_at(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._MessageBoard_updated_at(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var messageBoardsResponseImplementors = []string{"MessageBoardsResponse"}
+
+func (ec *executionContext) _MessageBoardsResponse(ctx context.Context, sel ast.SelectionSet, obj *model.MessageBoardsResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, messageBoardsResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MessageBoardsResponse")
+		case "messages":
+			out.Values[i] = ec._MessageBoardsResponse_messages(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total":
+			out.Values[i] = ec._MessageBoardsResponse_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "limit":
+			out.Values[i] = ec._MessageBoardsResponse_limit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "offset":
+			out.Values[i] = ec._MessageBoardsResponse_offset(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3547,6 +7325,83 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteProduct":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProduct(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createMantra":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createMantra(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateMantra":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateMantra(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteMantra":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMantra(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createMantraRecord":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createMantraRecord(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteMantraRecord":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMantraRecord(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createQuoteRecord":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createQuoteRecord(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateQuoteRecord":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateQuoteRecord(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteQuoteRecord":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteQuoteRecord(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createMessageBoard":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createMessageBoard(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "editMessageBoard":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_editMessageBoard(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteMessageBoard":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMessageBoard(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -3791,6 +7646,192 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "mantra":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_mantra(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "mantras":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_mantras(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "mantraRecord":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_mantraRecord(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "mantraRecords":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_mantraRecords(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "mantraDailyStats":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_mantraDailyStats(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "quoteRecord":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_quoteRecord(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "quoteRecords":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_quoteRecords(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "messageBoard":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_messageBoard(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "messageBoards":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_messageBoards(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -3799,6 +7840,115 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var quoteRecordImplementors = []string{"QuoteRecord"}
+
+func (ec *executionContext) _QuoteRecord(ctx context.Context, sel ast.SelectionSet, obj *model.QuoteRecord) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, quoteRecordImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("QuoteRecord")
+		case "id":
+			out.Values[i] = ec._QuoteRecord_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "jb_name":
+			out.Values[i] = ec._QuoteRecord_jb_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "quote":
+			out.Values[i] = ec._QuoteRecord_quote(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "said_at":
+			out.Values[i] = ec._QuoteRecord_said_at(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._QuoteRecord_created_at(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._QuoteRecord_updated_at(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var quoteRecordsResponseImplementors = []string{"QuoteRecordsResponse"}
+
+func (ec *executionContext) _QuoteRecordsResponse(ctx context.Context, sel ast.SelectionSet, obj *model.QuoteRecordsResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, quoteRecordsResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("QuoteRecordsResponse")
+		case "records":
+			out.Values[i] = ec._QuoteRecordsResponse_records(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total":
+			out.Values[i] = ec._QuoteRecordsResponse_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "limit":
+			out.Values[i] = ec._QuoteRecordsResponse_limit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "offset":
+			out.Values[i] = ec._QuoteRecordsResponse_offset(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4173,13 +8323,38 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCreateMantraInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMantraInput(ctx context.Context, v any) (model.CreateMantraInput, error) {
+	res, err := ec.unmarshalInputCreateMantraInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateMantraRecordInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMantraRecordInput(ctx context.Context, v any) (model.CreateMantraRecordInput, error) {
+	res, err := ec.unmarshalInputCreateMantraRecordInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMemberInput(ctx context.Context, v any) (model.CreateMemberInput, error) {
 	res, err := ec.unmarshalInputCreateMemberInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNCreateMessageBoardInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMessageBoardInput(ctx context.Context, v any) (model.CreateMessageBoardInput, error) {
+	res, err := ec.unmarshalInputCreateMessageBoardInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateProductInput2mantra_APIᚋgraphqlᚋmodelᚐCreateProductInput(ctx context.Context, v any) (model.CreateProductInput, error) {
 	res, err := ec.unmarshalInputCreateProductInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateQuoteRecordInput2mantra_APIᚋgraphqlᚋmodelᚐCreateQuoteRecordInput(ctx context.Context, v any) (model.CreateQuoteRecordInput, error) {
+	res, err := ec.unmarshalInputCreateQuoteRecordInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNEditMessageBoardInput2mantra_APIᚋgraphqlᚋmodelᚐEditMessageBoardInput(ctx context.Context, v any) (model.EditMessageBoardInput, error) {
+	res, err := ec.unmarshalInputEditMessageBoardInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -4229,6 +8404,204 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNMantra2mantra_APIᚋgraphqlᚋmodelᚐMantra(ctx context.Context, sel ast.SelectionSet, v model.Mantra) graphql.Marshaler {
+	return ec._Mantra(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMantra2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMantraᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Mantra) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMantra2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantra(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMantra2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantra(ctx context.Context, sel ast.SelectionSet, v *model.Mantra) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Mantra(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMantraDailyStat2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMantraDailyStatᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MantraDailyStat) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMantraDailyStat2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraDailyStat(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMantraDailyStat2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraDailyStat(ctx context.Context, sel ast.SelectionSet, v *model.MantraDailyStat) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MantraDailyStat(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMantraRecord2mantra_APIᚋgraphqlᚋmodelᚐMantraRecord(ctx context.Context, sel ast.SelectionSet, v model.MantraRecord) graphql.Marshaler {
+	return ec._MantraRecord(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMantraRecord2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecordᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MantraRecord) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMantraRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecord(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMantraRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecord(ctx context.Context, sel ast.SelectionSet, v *model.MantraRecord) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MantraRecord(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMantraRecordsResponse2mantra_APIᚋgraphqlᚋmodelᚐMantraRecordsResponse(ctx context.Context, sel ast.SelectionSet, v model.MantraRecordsResponse) graphql.Marshaler {
+	return ec._MantraRecordsResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMantraRecordsResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecordsResponse(ctx context.Context, sel ast.SelectionSet, v *model.MantraRecordsResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MantraRecordsResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMantrasResponse2mantra_APIᚋgraphqlᚋmodelᚐMantrasResponse(ctx context.Context, sel ast.SelectionSet, v model.MantrasResponse) graphql.Marshaler {
+	return ec._MantrasResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMantrasResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantrasResponse(ctx context.Context, sel ast.SelectionSet, v *model.MantrasResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MantrasResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNMember2mantra_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v model.Member) graphql.Marshaler {
@@ -4287,6 +8660,78 @@ func (ec *executionContext) marshalNMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMem
 		return graphql.Null
 	}
 	return ec._Member(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMessageBoard2mantra_APIᚋgraphqlᚋmodelᚐMessageBoard(ctx context.Context, sel ast.SelectionSet, v model.MessageBoard) graphql.Marshaler {
+	return ec._MessageBoard(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMessageBoard2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoardᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MessageBoard) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMessageBoard2ᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoard(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMessageBoard2ᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoard(ctx context.Context, sel ast.SelectionSet, v *model.MessageBoard) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MessageBoard(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMessageBoardsResponse2mantra_APIᚋgraphqlᚋmodelᚐMessageBoardsResponse(ctx context.Context, sel ast.SelectionSet, v model.MessageBoardsResponse) graphql.Marshaler {
+	return ec._MessageBoardsResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMessageBoardsResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoardsResponse(ctx context.Context, sel ast.SelectionSet, v *model.MessageBoardsResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MessageBoardsResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProduct2mantra_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v model.Product) graphql.Marshaler {
@@ -4361,6 +8806,78 @@ func (ec *executionContext) marshalNProductsResponse2ᚖmantra_APIᚋgraphqlᚋm
 	return ec._ProductsResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNQuoteRecord2mantra_APIᚋgraphqlᚋmodelᚐQuoteRecord(ctx context.Context, sel ast.SelectionSet, v model.QuoteRecord) graphql.Marshaler {
+	return ec._QuoteRecord(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNQuoteRecord2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecordᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.QuoteRecord) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNQuoteRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecord(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNQuoteRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecord(ctx context.Context, sel ast.SelectionSet, v *model.QuoteRecord) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._QuoteRecord(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNQuoteRecordsResponse2mantra_APIᚋgraphqlᚋmodelᚐQuoteRecordsResponse(ctx context.Context, sel ast.SelectionSet, v model.QuoteRecordsResponse) graphql.Marshaler {
+	return ec._QuoteRecordsResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNQuoteRecordsResponse2ᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecordsResponse(ctx context.Context, sel ast.SelectionSet, v *model.QuoteRecordsResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._QuoteRecordsResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4377,6 +8894,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNUpdateMantraInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMantraInput(ctx context.Context, v any) (model.UpdateMantraInput, error) {
+	res, err := ec.unmarshalInputUpdateMantraInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMemberInput(ctx context.Context, v any) (model.UpdateMemberInput, error) {
 	res, err := ec.unmarshalInputUpdateMemberInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4384,6 +8906,11 @@ func (ec *executionContext) unmarshalNUpdateMemberInput2mantra_APIᚋgraphqlᚋm
 
 func (ec *executionContext) unmarshalNUpdateProductInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateProductInput(ctx context.Context, v any) (model.UpdateProductInput, error) {
 	res, err := ec.unmarshalInputUpdateProductInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateQuoteRecordInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateQuoteRecordInput(ctx context.Context, v any) (model.UpdateQuoteRecordInput, error) {
+	res, err := ec.unmarshalInputUpdateQuoteRecordInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -4687,6 +9214,24 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v any) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalID(*v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
 	if v == nil {
 		return nil, nil
@@ -4705,6 +9250,20 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
+func (ec *executionContext) marshalOMantra2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantra(ctx context.Context, sel ast.SelectionSet, v *model.Mantra) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Mantra(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMantraRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐMantraRecord(ctx context.Context, sel ast.SelectionSet, v *model.MantraRecord) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MantraRecord(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v *model.Member) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -4712,11 +9271,25 @@ func (ec *executionContext) marshalOMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMem
 	return ec._Member(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOMessageBoard2ᚖmantra_APIᚋgraphqlᚋmodelᚐMessageBoard(ctx context.Context, sel ast.SelectionSet, v *model.MessageBoard) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MessageBoard(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v *model.Product) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Product(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOQuoteRecord2ᚖmantra_APIᚋgraphqlᚋmodelᚐQuoteRecord(ctx context.Context, sel ast.SelectionSet, v *model.QuoteRecord) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._QuoteRecord(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {

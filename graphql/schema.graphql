@@ -22,6 +22,48 @@ type Product {
   updated_at: String
 }
 
+# ========== Mantra Type ==========
+type Mantra {
+  id: ID!
+  content: String!
+  description: String
+  created_at: String
+  updated_at: String
+}
+
+type MantraRecord {
+  id: ID!
+  mantra_id: ID!
+  location: String
+  said_at: String
+  created_at: String
+  updated_at: String
+}
+
+type MantraDailyStat {
+  mantra_id: ID!
+  stat_date: String!
+  count: Int!
+}
+
+type QuoteRecord {
+  id: ID!
+  jb_name: String!
+  quote: String!
+  said_at: String
+  created_at: String
+  updated_at: String
+}
+
+type MessageBoard {
+  id: ID!
+  message: String!
+  quote_record_id: ID!
+  is_edited: Boolean!
+  created_at: String
+  updated_at: String
+}
+
 type Query {
   """
   Fetch a single member by ID
@@ -43,11 +85,56 @@ type Query {
   Fetch a list of products with pagination
   """
   products(limit: Int, offset: Int): ProductsResponse!
+
+  # ========== Mantra Queries ==========
+  mantra(id: ID!): Mantra
+  mantras(limit: Int, offset: Int): MantrasResponse!
+
+  # ========== MantraRecord Queries ==========
+  mantraRecord(id: ID!): MantraRecord
+  mantraRecords(mantra_id: ID, limit: Int, offset: Int): MantraRecordsResponse!
+  mantraDailyStats(mantra_id: ID!, days: Int!): [MantraDailyStat!]!
+
+  # ========== QuoteRecord Queries ==========
+  quoteRecord(id: ID!): QuoteRecord
+  quoteRecords(limit: Int, offset: Int): QuoteRecordsResponse!
+
+  # ========== MessageBoard Queries ==========
+  messageBoard(id: ID!): MessageBoard
+  messageBoards(quote_record_id: ID!, limit: Int, offset: Int): MessageBoardsResponse!
 }
 
 # ========== Product Response with Pagination ==========
 type ProductsResponse {
   products: [Product!]!
+  total: Int!
+  limit: Int!
+  offset: Int!
+}
+
+type MantrasResponse {
+  mantras: [Mantra!]!
+  total: Int!
+  limit: Int!
+  offset: Int!
+}
+
+type MantraRecordsResponse {
+  records: [MantraRecord!]!
+  total: Int!
+  limit: Int!
+  offset: Int!
+}
+
+type QuoteRecordsResponse {
+  records: [QuoteRecord!]!
+  total: Int!
+  limit: Int!
+  offset: Int!
+}
+
+type MessageBoardsResponse {
+  messages: [MessageBoard!]!
   total: Int!
   limit: Int!
   offset: Int!
@@ -84,6 +171,25 @@ type Mutation {
   Delete a product (soft delete)
   """
   deleteProduct(id: ID!): Boolean!
+
+  # ========== Mantra Mutations ==========
+  createMantra(input: CreateMantraInput!): Mantra!
+  updateMantra(id: ID!, input: UpdateMantraInput!): Mantra!
+  deleteMantra(id: ID!): Boolean!
+
+  # ========== MantraRecord Mutations ==========
+  createMantraRecord(input: CreateMantraRecordInput!): MantraRecord!
+  deleteMantraRecord(id: ID!): Boolean!
+
+  # ========== QuoteRecord Mutations ==========
+  createQuoteRecord(input: CreateQuoteRecordInput!): QuoteRecord!
+  updateQuoteRecord(id: ID!, input: UpdateQuoteRecordInput!): QuoteRecord!
+  deleteQuoteRecord(id: ID!): Boolean!
+
+  # ========== MessageBoard Mutations ==========
+  createMessageBoard(input: CreateMessageBoardInput!): MessageBoard!
+  editMessageBoard(id: ID!, input: EditMessageBoardInput!): MessageBoard!
+  deleteMessageBoard(id: ID!): Boolean!
 }
 
 input CreateMemberInput {
@@ -112,4 +218,41 @@ input UpdateProductInput {
   product_description: String
   product_image: String
   product_stock: Int
+}
+
+input CreateMantraInput {
+  content: String!
+  description: String
+}
+
+input UpdateMantraInput {
+  content: String
+  description: String
+}
+
+input CreateMantraRecordInput {
+  mantra_id: ID!
+  location: String
+  said_at: String
+}
+
+input CreateQuoteRecordInput {
+  jb_name: String!
+  quote: String!
+  said_at: String
+}
+
+input UpdateQuoteRecordInput {
+  jb_name: String
+  quote: String
+  said_at: String
+}
+
+input CreateMessageBoardInput {
+  quote_record_id: ID!
+  message: String!
+}
+
+input EditMessageBoardInput {
+  message: String!
 }
