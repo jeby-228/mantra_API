@@ -2,10 +2,26 @@
 
 package model
 
+type CreateMantraInput struct {
+	Content     string  `json:"content"`
+	Description *string `json:"description,omitempty"`
+}
+
+type CreateMantraRecordInput struct {
+	MantraID string  `json:"mantra_id"`
+	Location *string `json:"location,omitempty"`
+	SaidAt   *string `json:"said_at,omitempty"`
+}
+
 type CreateMemberInput struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type CreateMessageBoardInput struct {
+	QuoteRecordID string `json:"quote_record_id"`
+	Message       string `json:"message"`
 }
 
 type CreateProductInput struct {
@@ -16,6 +32,53 @@ type CreateProductInput struct {
 	ProductStock       int     `json:"product_stock"`
 }
 
+type CreateQuoteRecordInput struct {
+	JbName string  `json:"jb_name"`
+	Quote  string  `json:"quote"`
+	SaidAt *string `json:"said_at,omitempty"`
+}
+
+type EditMessageBoardInput struct {
+	Message string `json:"message"`
+}
+
+type Mantra struct {
+	ID          string  `json:"id"`
+	Content     string  `json:"content"`
+	Description *string `json:"description,omitempty"`
+	CreatedAt   *string `json:"created_at,omitempty"`
+	UpdatedAt   *string `json:"updated_at,omitempty"`
+}
+
+type MantraDailyStat struct {
+	MantraID string `json:"mantra_id"`
+	StatDate string `json:"stat_date"`
+	Count    int    `json:"count"`
+}
+
+type MantraRecord struct {
+	ID        string  `json:"id"`
+	MantraID  string  `json:"mantra_id"`
+	Location  *string `json:"location,omitempty"`
+	SaidAt    *string `json:"said_at,omitempty"`
+	CreatedAt *string `json:"created_at,omitempty"`
+	UpdatedAt *string `json:"updated_at,omitempty"`
+}
+
+type MantraRecordsResponse struct {
+	Records []*MantraRecord `json:"records"`
+	Total   int             `json:"total"`
+	Limit   int             `json:"limit"`
+	Offset  int             `json:"offset"`
+}
+
+type MantrasResponse struct {
+	Mantras []*Mantra `json:"mantras"`
+	Total   int       `json:"total"`
+	Limit   int       `json:"limit"`
+	Offset  int       `json:"offset"`
+}
+
 // GraphQL Schema for Member API.
 // This SDL mirrors the implemented queries in the Go resolvers.
 type Member struct {
@@ -24,6 +87,22 @@ type Member struct {
 	Email     string  `json:"email"`
 	CreatedAt *string `json:"created_at,omitempty"`
 	UpdatedAt *string `json:"updated_at,omitempty"`
+}
+
+type MessageBoard struct {
+	ID            string  `json:"id"`
+	Message       string  `json:"message"`
+	QuoteRecordID string  `json:"quote_record_id"`
+	IsEdited      bool    `json:"is_edited"`
+	CreatedAt     *string `json:"created_at,omitempty"`
+	UpdatedAt     *string `json:"updated_at,omitempty"`
+}
+
+type MessageBoardsResponse struct {
+	Messages []*MessageBoard `json:"messages"`
+	Total    int             `json:"total"`
+	Limit    int             `json:"limit"`
+	Offset   int             `json:"offset"`
 }
 
 type Mutation struct {
@@ -50,6 +129,27 @@ type ProductsResponse struct {
 type Query struct {
 }
 
+type QuoteRecord struct {
+	ID        string  `json:"id"`
+	JbName    string  `json:"jb_name"`
+	Quote     string  `json:"quote"`
+	SaidAt    *string `json:"said_at,omitempty"`
+	CreatedAt *string `json:"created_at,omitempty"`
+	UpdatedAt *string `json:"updated_at,omitempty"`
+}
+
+type QuoteRecordsResponse struct {
+	Records []*QuoteRecord `json:"records"`
+	Total   int            `json:"total"`
+	Limit   int            `json:"limit"`
+	Offset  int            `json:"offset"`
+}
+
+type UpdateMantraInput struct {
+	Content     *string `json:"content,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
 type UpdateMemberInput struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
@@ -61,4 +161,10 @@ type UpdateProductInput struct {
 	ProductDescription *string  `json:"product_description,omitempty"`
 	ProductImage       *string  `json:"product_image,omitempty"`
 	ProductStock       *int     `json:"product_stock,omitempty"`
+}
+
+type UpdateQuoteRecordInput struct {
+	JbName *string `json:"jb_name,omitempty"`
+	Quote  *string `json:"quote,omitempty"`
+	SaidAt *string `json:"said_at,omitempty"`
 }

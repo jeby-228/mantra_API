@@ -81,6 +81,11 @@ func initPostgreSQL() error {
 	if err := gormDB.WithContext(ctx).AutoMigrate(
 		&models.Member{},
 		&models.Product{},
+		&models.Mantra{},
+		&models.MantraRecord{},
+		&models.MantraDailyStat{},
+		&models.QuoteRecord{},
+		&models.MessageBoard{},
 	); err != nil {
 		return err
 	}
