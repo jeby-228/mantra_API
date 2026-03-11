@@ -1,3 +1,14 @@
+talbe name : Base
+| Name | Type | Description |
+| ------------- | ------ | ---------------------------------- |
+| CreationTime | time.Time | 記錄創建時間 |
+| CreatorId | uint | 記錄創建者的用戶ID |
+|Sort | int | 排序欄位 (非必填) |
+|LastModificationTime | time.Time | 記錄最後修改時間 (非必填) |
+|LastModifierId | uint | 記錄最後修改者的用戶ID (非必填) |
+|IsDeleted | bool | 軟刪除標記，默認為 false |
+|DeleterAt | uint | 記錄刪除者的用戶ID (非必填) |
+
 talbe name : user
 | Name | Type | Description |
 | ------------- | ------ | ---------------------------------- |
