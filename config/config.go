@@ -40,7 +40,10 @@ func Load() *Config {
 			Port: getEnv("PORT", "8080"),
 		},
 		CORS: CORSConfig{
-			AllowOrigins: getEnvStringSlice("CORS_ALLOW_ORIGINS", []string{"http://localhost:5173", "http://localhost:4173"}),
+			AllowOrigins: getEnvStringSlice(
+				"CORS_ALLOW_ORIGINS",
+				[]string{"http://localhost:5173", "http://localhost:4173"},
+			),
 		},
 	}
 }

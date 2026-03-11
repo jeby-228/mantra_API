@@ -31,7 +31,11 @@ func TestLoad(t *testing.T) {
 				assert.Equal(t, 25, cfg.Database.MaxIdleConns)
 				assert.Equal(t, time.Hour, cfg.Database.ConnMaxLifetime)
 				assert.Equal(t, "8080", cfg.Server.Port)
-				assert.Equal(t, []string{"http://localhost:5173", "http://localhost:4173"}, cfg.CORS.AllowOrigins)
+				assert.Equal(
+					t,
+					[]string{"http://localhost:5173", "http://localhost:4173"},
+					cfg.CORS.AllowOrigins,
+				)
 			},
 		},
 		{
@@ -56,7 +60,11 @@ func TestLoad(t *testing.T) {
 				assert.Equal(t, 10, cfg.Database.MaxIdleConns)
 				assert.Equal(t, time.Hour, cfg.Database.ConnMaxLifetime)
 				assert.Equal(t, "8080", cfg.Server.Port)
-				assert.Equal(t, []string{"https://example.com", "https://app.example.com"}, cfg.CORS.AllowOrigins)
+				assert.Equal(
+					t,
+					[]string{"https://example.com", "https://app.example.com"},
+					cfg.CORS.AllowOrigins,
+				)
 			},
 		},
 		{
@@ -77,7 +85,11 @@ func TestLoad(t *testing.T) {
 				assert.Equal(t, 25, cfg.Database.MaxOpenConns)
 				assert.Equal(t, 25, cfg.Database.MaxIdleConns)
 				assert.Equal(t, "3000", cfg.Server.Port)
-				assert.Equal(t, []string{"http://localhost:5173", "http://localhost:4173"}, cfg.CORS.AllowOrigins)
+				assert.Equal(
+					t,
+					[]string{"http://localhost:5173", "http://localhost:4173"},
+					cfg.CORS.AllowOrigins,
+				)
 			},
 		},
 	}
