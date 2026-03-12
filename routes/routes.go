@@ -22,6 +22,7 @@ func SetupRouter(router *gin.Engine) {
 		// Authentication-related routes
 		public.POST("/register", controllers.Register)
 		public.POST("/login", controllers.Login)
+		public.POST("/auth/line", controllers.LineLogin)
 	}
 
 	// GraphQL endpoint
