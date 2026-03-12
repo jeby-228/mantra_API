@@ -5,5 +5,6 @@ type Member struct {
 	Name         string `gorm:"size:255;not null"             json:"name"`
 	Email        string `gorm:"size:255;uniqueIndex;not null" json:"email"`
 	PasswordHash string `gorm:"size:255"                      json:"-"`
+	LineID       string `gorm:"size:255;uniqueIndex"          json:"line_id"`
 	Base
 }

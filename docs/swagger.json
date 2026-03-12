@@ -22,6 +22,67 @@
     "host": "localhost:9876",
     "basePath": "/api/v1",
     "paths": {
+        "/auth/line": {
+            "post": {
+                "description": "使用 LINE 授權碼登入，返回 JWT token 和用戶信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "認證"
+                ],
+                "summary": "LINE 登入",
+                "parameters": [
+                    {
+                        "description": "LINE 登入信息",
+                        "name": "lineLogin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.LineLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "登入成功",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "請求參數錯誤",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "無效的 LINE 授權碼",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "服務器錯誤",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "description": "檢查服務器狀態和數據庫連接狀態",
@@ -827,6 +888,23 @@
                     "type": "integer",
                     "minimum": 0,
                     "example": 100
+                }
+            }
+        },
+        "controllers.LineLoginRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "redirect_uri"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "auth_code_from_line"
+                },
+                "redirect_uri": {
+                    "type": "string",
+                    "example": "http://localhost:5173/auth/callback"
                 }
             }
         },
