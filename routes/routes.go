@@ -42,6 +42,10 @@ func SetupRouter(router *gin.Engine) {
 	protected := router.Group("/api/v1")
 	protected.Use(auth.AuthMiddleware()) // Add authentication middleware
 	{
+		// LINE Bind/Unbind
+		protected.POST("/auth/line/bind", controllers.BindLine)
+		protected.POST("/auth/line/unbind", controllers.UnbindLine)
+
 		protected.GET("/users", controllers.GetUsers)
 		protected.GET("/user/:id", func(c *gin.Context) {
 			controllers.GetUserByID(c)
