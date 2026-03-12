@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"mantra_API/auth"
 	"mantra_API/models"
@@ -232,7 +233,7 @@ func LineLogin(c *gin.Context) {
 		return
 	}
 
-	tokenURL := "https://api.line.me/oauth2/v2.1/token"
+	tokenURL := "https://api.line.me/oauth2/v2.1/token" //nolint:gosec
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
 	data.Set("code", req.Code)
@@ -240,7 +241,18 @@ func LineLogin(c *gin.Context) {
 	data.Set("client_id", channelID)
 	data.Set("client_secret", channelSecret)
 
-	resp, err := http.PostForm(tokenURL, data)
+	reqToken, err := http.NewRequestWithContext(
+		c.Request.Context(),
+		http.MethodPost,
+		tokenURL,
+		strings.NewReader(data.Encode()),
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法建立請求"})
+		return
+	}
+	reqToken.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := http.DefaultClient.Do(reqToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法連接到 LINE"})
 		return
@@ -263,7 +275,16 @@ func LineLogin(c *gin.Context) {
 
 	// 2. Get User Profile from LINE
 	profileURL := "https://api.line.me/v2/profile"
-	reqProfile, _ := http.NewRequest("GET", profileURL, nil)
+	reqProfile, err := http.NewRequestWithContext(
+		c.Request.Context(),
+		http.MethodGet,
+		profileURL,
+		nil,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法建立請求"})
+		return
+	}
 	reqProfile.Header.Set("Authorization", "Bearer "+tokenResp.AccessToken)
 
 	client := &http.Client{}
@@ -286,7 +307,9 @@ func LineLogin(c *gin.Context) {
 
 	// 3. Find or Create User
 	var member models.Member
-	result := db.WithContext(c.Request.Context()).Where("line_id = ?", lineProfile.UserID).First(&member)
+	result := db.WithContext(c.Request.Context()).
+		Where("line_id = ?", lineProfile.UserID).
+		First(&member)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		// Create new user
