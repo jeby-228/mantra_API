@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
+	"os"
 
 	"mantra_API/auth"
 	"mantra_API/models"
@@ -21,6 +24,11 @@ type RegisterRequest struct {
 	Name     string `json:"name"     binding:"required"       example:"張三"`
 	Email    string `json:"email"    binding:"required,email" example:"user@example.com"`
 	Password string `json:"password" binding:"required,min=6" example:"password123"`
+}
+
+type LineLoginRequest struct {
+	Code        string `json:"code"         binding:"required" example:"auth_code_from_line"`
+	RedirectURI string `json:"redirect_uri" binding:"required" example:"http://localhost:5173/auth/callback"`
 }
 
 type AuthResponse struct {
@@ -189,4 +197,122 @@ func GetProfile(c *gin.Context) {
 		http.StatusOK,
 		gin.H{"user": User{ID: int64(member.ID), Name: member.Name, Email: member.Email}},
 	)
+}
+
+// LineLogin 處理 LINE 登入
+// @Summary LINE 登入
+// @Description 使用 LINE 授權碼登入，返回 JWT token 和用戶信息
+// @Tags 認證
+// @Accept json
+// @Produce json
+// @Param lineLogin body LineLoginRequest true "LINE 登入信息"
+// @Success 200 {object} AuthResponse "登入成功"
+// @Failure 400 {object} map[string]string "請求參數錯誤"
+// @Failure 401 {object} map[string]string "無效的 LINE 授權碼"
+// @Failure 500 {object} map[string]string "服務器錯誤"
+// @Router /auth/line [post]
+func LineLogin(c *gin.Context) {
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
+		return
+	}
+
+	var req LineLoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 1. Exchange Code for Token
+	channelID := os.Getenv("LINE_CHANNEL_ID")
+	channelSecret := os.Getenv("LINE_CHANNEL_SECRET")
+
+	if channelID == "" || channelSecret == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "LINE 配置未設定"})
+		return
+	}
+
+	tokenURL := "https://api.line.me/oauth2/v2.1/token"
+	data := url.Values{}
+	data.Set("grant_type", "authorization_code")
+	data.Set("code", req.Code)
+	data.Set("redirect_uri", req.RedirectURI)
+	data.Set("client_id", channelID)
+	data.Set("client_secret", channelSecret)
+
+	resp, err := http.PostForm(tokenURL, data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法連接到 LINE"})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "無效的 LINE 授權碼"})
+		return
+	}
+
+	var tokenResp struct {
+		AccessToken string `json:"access_token"`
+		IDToken     string `json:"id_token"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法解析 LINE 回應"})
+		return
+	}
+
+	// 2. Get User Profile from LINE
+	profileURL := "https://api.line.me/v2/profile"
+	reqProfile, _ := http.NewRequest("GET", profileURL, nil)
+	reqProfile.Header.Set("Authorization", "Bearer "+tokenResp.AccessToken)
+
+	client := &http.Client{}
+	respProfile, err := client.Do(reqProfile)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法獲取 LINE 個人資料"})
+		return
+	}
+	defer respProfile.Body.Close()
+
+	var lineProfile struct {
+		UserID      string `json:"userId"`
+		DisplayName string `json:"displayName"`
+		PictureURL  string `json:"pictureUrl"`
+	}
+	if err := json.NewDecoder(respProfile.Body).Decode(&lineProfile); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法解析 LINE 個人資料"})
+		return
+	}
+
+	// 3. Find or Create User
+	var member models.Member
+	result := db.WithContext(c.Request.Context()).Where("line_id = ?", lineProfile.UserID).First(&member)
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		// Create new user
+		// Note: LINE doesn't always provide email. Using placeholder email.
+		member = models.Member{
+			Name:   lineProfile.DisplayName,
+			Email:  lineProfile.UserID + "@line.user",
+			LineID: lineProfile.UserID,
+		}
+		if err := db.WithContext(c.Request.Context()).Create(&member).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "無法創建用戶"})
+			return
+		}
+	}
+
+	// 4. Generate App Token
+	// #nosec G115 - member.ID 來自資料庫，不會溢位
+	user := User{ID: int64(member.ID), Name: member.Name, Email: member.Email}
+	token, err := auth.GenerateToken(user.ID, user.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token 生成失敗"})
+		return
+	}
+
+	c.JSON(http.StatusOK, AuthResponse{
+		Token: token,
+		User:  user,
+	})
 }
