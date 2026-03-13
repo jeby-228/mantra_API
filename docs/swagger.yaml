@@ -31,6 +31,18 @@ definitions:
     - product_price
     - product_stock
     type: object
+  controllers.LineLoginRequest:
+    properties:
+      code:
+        example: auth_code_from_line
+        type: string
+      redirect_uri:
+        example: http://localhost:5173/auth/callback
+        type: string
+    required:
+    - code
+    - redirect_uri
+    type: object
   controllers.LoginRequest:
     properties:
       email:
@@ -127,6 +139,46 @@ info:
   title: Member API
   version: "1.0"
 paths:
+  /auth/line:
+    post:
+      consumes:
+      - application/json
+      description: 使用 LINE 授權碼登入，返回 JWT token 和用戶信息
+      parameters:
+      - description: LINE 登入信息
+        in: body
+        name: lineLogin
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LineLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登入成功
+          schema:
+            $ref: '#/definitions/controllers.AuthResponse'
+        "400":
+          description: 請求參數錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: 無效的 LINE 授權碼
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 服務器錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: LINE 登入
+      tags:
+      - 認證
   /health:
     get:
       consumes:

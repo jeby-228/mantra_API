@@ -3,12 +3,14 @@ package config
 import (
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type Config struct {
 	Database DatabaseConfig
 	Server   ServerConfig
+	CORS     CORSConfig
 }
 
 type DatabaseConfig struct {
@@ -22,6 +24,10 @@ type ServerConfig struct {
 	Port string
 }
 
+type CORSConfig struct {
+	AllowOrigins []string
+}
+
 func Load() *Config {
 	return &Config{
 		Database: DatabaseConfig{
@@ -32,6 +38,12 @@ func Load() *Config {
 		},
 		Server: ServerConfig{
 			Port: getEnv("PORT", "8080"),
+		},
+		CORS: CORSConfig{
+			AllowOrigins: getEnvStringSlice(
+				"CORS_ALLOW_ORIGINS",
+				[]string{"http://localhost:5173", "http://localhost:4173"},
+			),
 		},
 	}
 }
@@ -48,6 +60,13 @@ func getEnvInt(key string, defaultValue int) int {
 		if intVal, err := strconv.Atoi(value); err == nil {
 			return intVal
 		}
+	}
+	return defaultValue
+}
+
+func getEnvStringSlice(key string, defaultValue []string) []string {
+	if value := os.Getenv(key); value != "" {
+		return strings.Split(value, ",")
 	}
 	return defaultValue
 }

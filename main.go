@@ -14,6 +14,7 @@ import (
 
 	_ "mantra_API/docs" // 導入 swagger 文檔
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv" // 新增
 	swaggerFiles "github.com/swaggo/files"
@@ -128,6 +129,9 @@ func main() {
 		log.Println("Warning: .env file not found, using environment variables")
 	}
 
+	// 載入設定
+	cfg := config.Load()
+
 	// 初始化 PostgreSQL 連接
 	if err := initPostgreSQL(); err != nil {
 		log.Printf("Warning: PostgreSQL connection failed: %v\n", err)
@@ -154,6 +158,14 @@ func main() {
 	// 創建 Gin 路由器
 	Router := gin.Default()
 
+	// 設置 CORS（允許前端跨域存取）
+	Router.Use(cors.New(cors.Config{
+		AllowOrigins:     cfg.CORS.AllowOrigins,
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
+
 	// 設置路由（需要在 GraphQL 初始化之後）
 	routes.SetupRouter(Router)
 
@@ -164,7 +176,6 @@ func main() {
 	Router.Any("/health", HealthCheck)
 
 	// 啟動服務器
-	cfg := config.Load()
 	log.Println("Server starting on :" + cfg.Server.Port)
 	if err := Router.Run(":" + cfg.Server.Port); err != nil {
 		log.Printf("Server failed to start: %v\n", err)
