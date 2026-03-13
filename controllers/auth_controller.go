@@ -224,88 +224,18 @@ func LineLogin(c *gin.Context) {
 		return
 	}
 
-	// 1. Exchange Code for Token
-	channelID := os.Getenv("LINE_CHANNEL_ID")
-	channelSecret := os.Getenv("LINE_CHANNEL_SECRET")
-
-	if channelID == "" || channelSecret == "" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "LINE 配置未設定"})
-		return
-	}
-
-	tokenURL := "https://api.line.me/oauth2/v2.1/token" //nolint:gosec
-	data := url.Values{}
-	data.Set("grant_type", "authorization_code")
-	data.Set("code", req.Code)
-	data.Set("redirect_uri", req.RedirectURI)
-	data.Set("client_id", channelID)
-	data.Set("client_secret", channelSecret)
-
-	reqToken, err := http.NewRequestWithContext(
-		c.Request.Context(),
-		http.MethodPost,
-		tokenURL,
-		strings.NewReader(data.Encode()),
-	)
+	// 1. Get LINE Profile
+	lineProfile, err := getLineProfile(c, req.Code, req.RedirectURI)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法建立請求"})
-		return
-	}
-	reqToken.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	resp, err := http.DefaultClient.Do(reqToken)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法連接到 LINE"})
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "無效的 LINE 授權碼"})
+		status := http.StatusInternalServerError
+		if err.Error() == "無效的 LINE 授權碼" || err.Error() == "LINE 配置未設定" {
+			status = http.StatusUnauthorized
+		}
+		c.JSON(status, gin.H{"error": err.Error()})
 		return
 	}
 
-	var tokenResp struct {
-		AccessToken string `json:"access_token"`
-		IDToken     string `json:"id_token"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法解析 LINE 回應"})
-		return
-	}
-
-	// 2. Get User Profile from LINE
-	profileURL := "https://api.line.me/v2/profile"
-	reqProfile, err := http.NewRequestWithContext(
-		c.Request.Context(),
-		http.MethodGet,
-		profileURL,
-		nil,
-	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法建立請求"})
-		return
-	}
-	reqProfile.Header.Set("Authorization", "Bearer "+tokenResp.AccessToken)
-
-	client := &http.Client{}
-	respProfile, err := client.Do(reqProfile)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法獲取 LINE 個人資料"})
-		return
-	}
-	defer respProfile.Body.Close()
-
-	var lineProfile struct {
-		UserID      string `json:"userId"`
-		DisplayName string `json:"displayName"`
-		PictureURL  string `json:"pictureUrl"`
-	}
-	if err := json.NewDecoder(respProfile.Body).Decode(&lineProfile); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法解析 LINE 個人資料"})
-		return
-	}
-
-	// 3. Find or Create User
+	// 2. Find or Create User
 	var member models.Member
 	result := db.WithContext(c.Request.Context()).
 		Where("line_id = ?", lineProfile.UserID).
@@ -337,5 +267,222 @@ func LineLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, AuthResponse{
 		Token: token,
 		User:  user,
+	})
+}
+
+// LineProfile 定義 LINE 個人資料結構
+type LineProfile struct {
+	UserID      string `json:"userId"`
+	DisplayName string `json:"displayName"`
+	PictureURL  string `json:"pictureUrl"`
+}
+
+// getLineProfile 處理 LINE 授權碼交換與獲取個人資料的邏輯
+func getLineProfile(c *gin.Context, code, redirectURI string) (*LineProfile, error) {
+	// 1. Exchange Code for Token
+	channelID := os.Getenv("LINE_CHANNEL_ID")
+	channelSecret := os.Getenv("LINE_CHANNEL_SECRET")
+
+	if channelID == "" || channelSecret == "" {
+		return nil, errors.New("LINE 配置未設定")
+	}
+
+	tokenURL := "https://api.line.me/oauth2/v2.1/token" //nolint:gosec
+	data := url.Values{}
+	data.Set("grant_type", "authorization_code")
+	data.Set("code", code)
+	data.Set("redirect_uri", redirectURI)
+	data.Set("client_id", channelID)
+	data.Set("client_secret", channelSecret)
+
+	reqToken, err := http.NewRequestWithContext(
+		c.Request.Context(),
+		http.MethodPost,
+		tokenURL,
+		strings.NewReader(data.Encode()),
+	)
+	if err != nil {
+		return nil, errors.New("無法建立請求")
+	}
+	reqToken.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := http.DefaultClient.Do(reqToken)
+	if err != nil {
+		return nil, errors.New("無法連接到 LINE")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("無效的 LINE 授權碼")
+	}
+
+	var tokenResp struct {
+		AccessToken string `json:"access_token"`
+		IDToken     string `json:"id_token"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
+		return nil, errors.New("無法解析 LINE 回應")
+	}
+
+	// 2. Get User Profile from LINE
+	profileURL := "https://api.line.me/v2/profile"
+	reqProfile, err := http.NewRequestWithContext(
+		c.Request.Context(),
+		http.MethodGet,
+		profileURL,
+		nil,
+	)
+	if err != nil {
+		return nil, errors.New("無法建立請求")
+	}
+	reqProfile.Header.Set("Authorization", "Bearer "+tokenResp.AccessToken)
+
+	client := &http.Client{}
+	respProfile, err := client.Do(reqProfile)
+	if err != nil {
+		return nil, errors.New("無法獲取 LINE 個人資料")
+	}
+	defer respProfile.Body.Close()
+
+	var lineProfile LineProfile
+	if err := json.NewDecoder(respProfile.Body).Decode(&lineProfile); err != nil {
+		return nil, errors.New("無法解析 LINE 個人資料")
+	}
+
+	return &lineProfile, nil
+}
+
+// BindLine 綁定 LINE 帳號
+// @Summary 綁定 LINE 帳號
+// @Description 將當前登入用戶綁定到 LINE 帳號
+// @Tags 認證
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param lineBind body LineLoginRequest true "LINE 綁定信息"
+// @Success 200 {object} map[string]User "綁定成功"
+// @Failure 400 {object} map[string]string "請求參數錯誤"
+// @Failure 401 {object} map[string]string "未認證或 LINE 授權失敗"
+// @Failure 409 {object} map[string]string "該 LINE 帳號已被其他會員綁定"
+// @Failure 500 {object} map[string]string "服務器錯誤"
+// @Router /auth/line/bind [post]
+func BindLine(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
+		return
+	}
+	idValue, ok := userID.(int64)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
+		return
+	}
+
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
+		return
+	}
+
+	var req LineLoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	lineProfile, err := getLineProfile(c, req.Code, req.RedirectURI)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if err.Error() == "無效的 LINE 授權碼" {
+			status = http.StatusUnauthorized
+		}
+		c.JSON(status, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 檢查 LINE ID 是否已被其他用戶綁定
+	var existingMember models.Member
+	err = db.WithContext(c.Request.Context()).
+		Where("line_id = ?", lineProfile.UserID).
+		First(&existingMember).Error
+
+	if err == nil {
+		// 如果找到記錄，且不是當前用戶，則報錯
+		// #nosec G115 - ID 來自資料庫，不會溢位
+		if int64(existingMember.ID) != idValue {
+			c.JSON(http.StatusConflict, gin.H{"error": "該 LINE 帳號已被其他會員綁定"})
+			return
+		}
+		// 如果是當前用戶，視為成功（idempotent）
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 綁定 LINE ID 到當前用戶
+	var member models.Member
+	if err := db.WithContext(c.Request.Context()).First(&member, idValue).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "用戶不存在"})
+		return
+	}
+
+	member.LineID = lineProfile.UserID
+	if err := db.WithContext(c.Request.Context()).Save(&member).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法更新用戶資料"})
+		return
+	}
+
+	// #nosec G115 - member.ID 來自資料庫，不會溢位
+	c.JSON(http.StatusOK, gin.H{
+		"user": User{ID: int64(member.ID), Name: member.Name, Email: member.Email},
+	})
+}
+
+// UnbindLine 解除綁定 LINE 帳號
+// @Summary 解除綁定 LINE 帳號
+// @Description 解除當前登入用戶的 LINE 帳號綁定
+// @Tags 認證
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]User "解除綁定成功"
+// @Failure 401 {object} map[string]string "未認證"
+// @Failure 500 {object} map[string]string "服務器錯誤"
+// @Router /auth/line/unbind [post]
+func UnbindLine(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
+		return
+	}
+	idValue, ok := userID.(int64)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
+		return
+	}
+
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
+		return
+	}
+
+	var member models.Member
+	if err := db.WithContext(c.Request.Context()).First(&member, idValue).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "用戶不存在"})
+		return
+	}
+
+	// 清除 LineID，使用 NULL 避免 unique index 在空字串上衝突。
+	if err := db.WithContext(c.Request.Context()).
+		Model(&member).
+		Update("line_id", nil).
+		Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法更新用戶資料"})
+		return
+	}
+
+	member.LineID = ""
+
+	// #nosec G115 - member.ID 來自資料庫，不會溢位
+	c.JSON(http.StatusOK, gin.H{
+		"user": User{ID: int64(member.ID), Name: member.Name, Email: member.Email},
 	})
 }
