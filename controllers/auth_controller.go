@@ -471,7 +471,10 @@ func UnbindLine(c *gin.Context) {
 	}
 
 	// 清除 LineID，使用 NULL 避免 unique index 在空字串上衝突。
-	if err := db.WithContext(c.Request.Context()).Model(&member).Update("line_id", nil).Error; err != nil {
+	if err := db.WithContext(c.Request.Context()).
+		Model(&member).
+		Update("line_id", nil).
+		Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法更新用戶資料"})
 		return
 	}
