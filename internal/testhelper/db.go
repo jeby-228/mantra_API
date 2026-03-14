@@ -1,6 +1,8 @@
 package testhelper
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -13,12 +15,18 @@ import (
 func NewSQLiteTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
 
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	dsn := fmt.Sprintf(
+		"file:%s_%d?mode=memory&cache=shared",
+		strings.ReplaceAll(t.Name(), "/", "_"),
+		time.Now().UnixNano(),
+	)
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
 		t.Fatalf("open test db failed: %v", err)
 	}
 
 	err = db.AutoMigrate(
+		&models.Member{},
 		&models.Mantra{},
 		&models.MantraRecord{},
 		&models.MantraDailyStat{},
