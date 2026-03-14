@@ -24,27 +24,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// @title Member API
-// @version 1.0
-// @description 這是一個使用 Go、Gin 框架和 PostgreSQL 構建的 RESTful 和 GraphQL API 服務，提供會員管理功能和 JWT 認證
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host localhost:9876
-// @BasePath /api/v1
-// @schemes http https
-
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
-// @description JWT 認證，格式：Bearer {token}
-
 var db *gorm.DB
 
 func initPostgreSQL() error {
@@ -79,6 +58,8 @@ func initPostgreSQL() error {
 		return err
 	}
 
+	db = gormDB
+
 	if err := gormDB.WithContext(ctx).AutoMigrate(
 		&models.Member{},
 		&models.Product{},
@@ -90,10 +71,6 @@ func initPostgreSQL() error {
 	); err != nil {
 		return err
 	}
-
-	db = gormDB
-	controllers.SetupUserController(db)
-	controllers.SetupProductController(db)
 
 	log.Println("Connected to PostgreSQL!")
 	return nil
@@ -154,6 +131,9 @@ func main() {
 	} else {
 		log.Println("[Main] GraphQL setup completed successfully")
 	}
+
+	// 注入 controllers 共用資料庫連線。
+	controllers.SetDB(db)
 
 	// 創建 Gin 路由器
 	Router := gin.Default()
