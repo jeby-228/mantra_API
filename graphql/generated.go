@@ -863,12 +863,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateMantraInput,
 		ec.unmarshalInputCreateMantraRecordInput,
-		ec.unmarshalInputCreateMemberInput,
 		ec.unmarshalInputCreateMessageBoardInput,
 		ec.unmarshalInputCreateQuoteRecordInput,
 		ec.unmarshalInputEditMessageBoardInput,
 		ec.unmarshalInputUpdateMantraInput,
-		ec.unmarshalInputUpdateMemberInput,
 		ec.unmarshalInputUpdateQuoteRecordInput,
 	)
 	first := true
@@ -6012,47 +6010,6 @@ func (ec *executionContext) unmarshalInputCreateMantraRecordInput(ctx context.Co
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputCreateMemberInput(ctx context.Context, obj any) (model.CreateMemberInput, error) {
-	var it model.CreateMemberInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"name", "email", "password"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputCreateMessageBoardInput(ctx context.Context, obj any) (model.CreateMessageBoardInput, error) {
 	var it model.CreateMessageBoardInput
 	asMap := map[string]any{}
@@ -6183,40 +6140,6 @@ func (ec *executionContext) unmarshalInputUpdateMantraInput(ctx context.Context,
 				return it, err
 			}
 			it.Description = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateMemberInput(ctx context.Context, obj any) (model.UpdateMemberInput, error) {
-	var it model.UpdateMemberInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"name", "email"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
 		}
 	}
 

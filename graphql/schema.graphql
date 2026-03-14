@@ -162,18 +162,6 @@ type Mutation {
   deleteMessageBoard(id: ID!): Boolean!
 }
 
-input CreateMemberInput {
-  name: String!
-  email: String!
-  password: String!
-}
-
-input UpdateMemberInput {
-  name: String!
-  email: String!
-}
-
-
 input CreateMantraInput {
   content: String!
   description: String

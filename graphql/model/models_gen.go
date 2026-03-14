@@ -13,12 +13,6 @@ type CreateMantraRecordInput struct {
 	SaidAt   *string `json:"said_at,omitempty"`
 }
 
-type CreateMemberInput struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 type CreateMessageBoardInput struct {
 	QuoteRecordID string `json:"quote_record_id"`
 	Message       string `json:"message"`
@@ -140,11 +134,6 @@ type QuoteRecordsResponse struct {
 type UpdateMantraInput struct {
 	Content     *string `json:"content,omitempty"`
 	Description *string `json:"description,omitempty"`
-}
-
-type UpdateMemberInput struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
 }
 
 type UpdateQuoteRecordInput struct {
