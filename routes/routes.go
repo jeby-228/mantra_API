@@ -12,10 +12,6 @@ import (
 
 // SetupRouter registers API routes on the provided Gin engine.
 func SetupRouter(router *gin.Engine) {
-	router.GET("/Hello", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Hello, RESTful API!"})
-	})
-
 	// Public - no authentication required
 	public := router.Group("/api/v1")
 	{
@@ -45,19 +41,5 @@ func SetupRouter(router *gin.Engine) {
 		// LINE Bind/Unbind
 		protected.POST("/auth/line/bind", controllers.BindLine)
 		protected.POST("/auth/line/unbind", controllers.UnbindLine)
-
-		protected.GET("/users", controllers.GetUsers)
-		protected.GET("/user/:id", func(c *gin.Context) {
-			controllers.GetUserByID(c)
-		})
-		protected.GET("/profile", controllers.GetProfile) // Get current user information
-		protected.DELETE("/user/:id", controllers.DeleteUserByID)
-
-		// Product routes
-		protected.GET("/products", controllers.GetProducts)
-		protected.GET("/product/:id", controllers.GetProductByID)
-		protected.POST("/product", controllers.CreateProduct)
-		protected.PUT("/product/:id", controllers.UpdateProduct)
-		protected.DELETE("/product/:id", controllers.DeleteProduct)
 	}
 }
