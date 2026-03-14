@@ -6,6 +6,12 @@ default:
 setup:
     @echo "安裝 golangci-lint..."
     @curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ./bin
+    @echo "安裝 swag..."
+    @SWAG_BIN="${GOBIN:-$(go env GOPATH)/bin}/swag"; \
+    if [ ! -x "$SWAG_BIN" ]; then \
+        go install github.com/swaggo/swag/cmd/swag@latest; \
+    fi; \
+    "$SWAG_BIN" --version
     @echo "安裝相依套件..."
     go mod download
     @echo "設定完成！"
@@ -58,6 +64,13 @@ test-cov:
 graphql:
     go get github.com/99designs/gqlgen@v0.17.85
     go run github.com/99designs/gqlgen generate
+
+# 生成 swagger
+swag:
+    @SWAG_BIN="${GOBIN:-$(go env GOPATH)/bin}/swag"; \
+    [ -x "$SWAG_BIN" ] || SWAG_BIN="$(command -v swag 2>/dev/null || true)"; \
+    [ -n "$SWAG_BIN" ] || { echo "swag 尚未安裝，請先執行 just setup"; exit 1; }; \
+    "$SWAG_BIN" init
 
 # 清理
 clean:
