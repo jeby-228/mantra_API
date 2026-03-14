@@ -1,4 +1,3 @@
-basePath: /api/v1
 definitions:
   controllers.AuthResponse:
     properties:
@@ -7,29 +6,6 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/controllers.User'
-    type: object
-  controllers.CreateProductRequest:
-    properties:
-      product_description:
-        example: 最新款 iPhone
-        type: string
-      product_image:
-        example: https://example.com/image.jpg
-        type: string
-      product_name:
-        example: iPhone 15 Pro
-        type: string
-      product_price:
-        example: 35900
-        type: number
-      product_stock:
-        example: 100
-        minimum: 0
-        type: integer
-    required:
-    - product_name
-    - product_price
-    - product_stock
     type: object
   controllers.LineLoginRequest:
     properties:
@@ -56,27 +32,6 @@ definitions:
     - email
     - password
     type: object
-  controllers.ProductResponse:
-    properties:
-      id:
-        example: 1
-        type: integer
-      product_description:
-        example: 最新款 iPhone
-        type: string
-      product_image:
-        example: https://example.com/image.jpg
-        type: string
-      product_name:
-        example: iPhone 15 Pro
-        type: string
-      product_price:
-        example: 35900
-        type: number
-      product_stock:
-        example: 100
-        type: integer
-    type: object
   controllers.RegisterRequest:
     properties:
       email:
@@ -94,24 +49,6 @@ definitions:
     - name
     - password
     type: object
-  controllers.UpdateProductRequest:
-    properties:
-      product_description:
-        example: 更新的描述
-        type: string
-      product_image:
-        example: https://example.com/new-image.jpg
-        type: string
-      product_name:
-        example: iPhone 15 Pro Max
-        type: string
-      product_price:
-        example: 42900
-        type: number
-      product_stock:
-        example: 50
-        type: integer
-    type: object
   controllers.User:
     properties:
       email:
@@ -124,20 +61,8 @@ definitions:
         example: 張三
         type: string
     type: object
-host: localhost:9876
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: 這是一個使用 Go、Gin 框架和 PostgreSQL 構建的 RESTful 和 GraphQL API 服務，提供會員管理功能和
-    JWT 認證
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: Member API
-  version: "1.0"
+  contact: {}
 paths:
   /auth/line:
     post:
@@ -177,6 +102,87 @@ paths:
               type: string
             type: object
       summary: LINE 登入
+      tags:
+      - 認證
+  /auth/line/bind:
+    post:
+      consumes:
+      - application/json
+      description: 將當前登入用戶綁定到 LINE 帳號
+      parameters:
+      - description: LINE 綁定信息
+        in: body
+        name: lineBind
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LineLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 綁定成功
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/controllers.User'
+            type: object
+        "400":
+          description: 請求參數錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: 未認證或 LINE 授權失敗
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 該 LINE 帳號已被其他會員綁定
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 服務器錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 綁定 LINE 帳號
+      tags:
+      - 認證
+  /auth/line/unbind:
+    post:
+      consumes:
+      - application/json
+      description: 解除當前登入用戶的 LINE 帳號綁定
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 解除綁定成功
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/controllers.User'
+            type: object
+        "401":
+          description: 未認證
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 服務器錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 解除綁定 LINE 帳號
       tags:
       - 認證
   /health:
@@ -236,285 +242,6 @@ paths:
       summary: 用戶登入
       tags:
       - 認證
-  /product:
-    post:
-      consumes:
-      - application/json
-      description: 創建新產品，需要 JWT 認證
-      parameters:
-      - description: 產品信息
-        in: body
-        name: product
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.CreateProductRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: 創建成功
-          schema:
-            additionalProperties:
-              $ref: '#/definitions/controllers.ProductResponse'
-            type: object
-        "400":
-          description: 請求參數錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 創建產品
-      tags:
-      - 產品
-  /product/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: 根據產品 ID 軟刪除產品，需要 JWT 認證
-      parameters:
-      - description: 產品 ID
-        example: 1
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 刪除成功
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: 無效的產品 ID
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: 產品不存在
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 刪除產品
-      tags:
-      - 產品
-    get:
-      consumes:
-      - application/json
-      description: 根據產品 ID 獲取單個產品的詳細信息，需要 JWT 認證
-      parameters:
-      - description: 產品 ID
-        example: 1
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 獲取成功
-          schema:
-            additionalProperties:
-              $ref: '#/definitions/controllers.ProductResponse'
-            type: object
-        "400":
-          description: 無效的產品 ID
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: 產品不存在
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 根據 ID 獲取產品
-      tags:
-      - 產品
-    put:
-      consumes:
-      - application/json
-      description: 根據產品 ID 更新產品信息，需要 JWT 認證
-      parameters:
-      - description: 產品 ID
-        example: 1
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 要更新的產品信息
-        in: body
-        name: product
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.UpdateProductRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 更新成功
-          schema:
-            additionalProperties:
-              $ref: '#/definitions/controllers.ProductResponse'
-            type: object
-        "400":
-          description: 請求參數錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: 產品不存在
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 更新產品
-      tags:
-      - 產品
-  /products:
-    get:
-      consumes:
-      - application/json
-      description: 獲取產品列表，最多返回 100 條記錄，需要 JWT 認證
-      parameters:
-      - default: 50
-        description: 限制返回數量
-        in: query
-        maximum: 100
-        minimum: 1
-        name: limit
-        type: integer
-      - default: 0
-        description: 偏移量
-        in: query
-        minimum: 0
-        name: offset
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 獲取成功
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 獲取所有產品
-      tags:
-      - 產品
-  /profile:
-    get:
-      consumes:
-      - application/json
-      description: 獲取當前登入用戶的詳細信息，需要 JWT 認證
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 獲取成功
-          schema:
-            additionalProperties:
-              $ref: '#/definitions/controllers.User'
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: 用戶不存在
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 獲取當前用戶信息
-      tags:
-      - 用戶
   /register:
     post:
       consumes:
@@ -555,133 +282,4 @@ paths:
       summary: 用戶註冊
       tags:
       - 認證
-  /user/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: 根據會員 ID 刪除會員，需要 JWT 認證
-      parameters:
-      - description: 會員 ID
-        example: 1
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 刪除成功
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: 無效的會員 ID
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 刪除會員
-      tags:
-      - 用戶
-    get:
-      consumes:
-      - application/json
-      description: 根據會員 ID 獲取單個會員的詳細信息，需要 JWT 認證
-      parameters:
-      - description: 會員 ID
-        example: 1
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 獲取成功
-          schema:
-            additionalProperties:
-              $ref: '#/definitions/controllers.User'
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: 會員不存在
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 根據 ID 獲取會員
-      tags:
-      - 用戶
-  /users:
-    get:
-      consumes:
-      - application/json
-      description: 獲取會員列表，最多返回 50 條記錄，需要 JWT 認證
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 獲取成功
-          schema:
-            additionalProperties:
-              items:
-                $ref: '#/definitions/controllers.User'
-              type: array
-            type: object
-        "401":
-          description: 未認證
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: 服務器錯誤
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: 獲取所有會員
-      tags:
-      - 用戶
-schemes:
-- http
-- https
-securityDefinitions:
-  BearerAuth:
-    description: JWT 認證，格式：Bearer {token}
-    in: header
-    name: Authorization
-    type: apiKey
 swagger: "2.0"

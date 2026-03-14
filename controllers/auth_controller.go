@@ -16,6 +16,19 @@ import (
 	"gorm.io/gorm"
 )
 
+var db *gorm.DB
+
+// SetDB 注入資料庫連線供 controllers 使用。
+func SetDB(database *gorm.DB) {
+	db = database
+}
+
+type User struct {
+	ID    int64  `json:"id"    example:"1"`
+	Name  string `json:"name"  example:"張三"`
+	Email string `json:"email" example:"user@example.com"`
+}
+
 type LoginRequest struct {
 	Email    string `json:"email"    binding:"required,email" example:"user@example.com"`
 	Password string `json:"password" binding:"required,min=6" example:"password123"`
@@ -151,54 +164,6 @@ func Login(input *gin.Context) {
 	})
 }
 
-// GetProfile 獲取當前用戶信息（需要認證）
-// @Summary 獲取當前用戶信息
-// @Description 獲取當前登入用戶的詳細信息，需要 JWT 認證
-// @Tags 用戶
-// @Accept json
-// @Produce json
-// @Security BearerAuth
-// @Success 200 {object} map[string]User "獲取成功"
-// @Failure 401 {object} map[string]string "未認證"
-// @Failure 404 {object} map[string]string "用戶不存在"
-// @Failure 500 {object} map[string]string "服務器錯誤"
-// @Router /profile [get]
-func GetProfile(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
-		return
-	}
-
-	if db == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
-		return
-	}
-
-	idValue, ok := userID.(int64)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
-		return
-	}
-
-	var member models.Member
-	if err := db.WithContext(c.Request.Context()).
-		Select("id", "name", "email").
-		First(&member, idValue).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "用戶不存在"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// #nosec G115 - member.ID 來自資料庫，不會溢位
-	c.JSON(
-		http.StatusOK,
-		gin.H{"user": User{ID: int64(member.ID), Name: member.Name, Email: member.Email}},
-	)
-}
 
 // LineLogin 處理 LINE 登入
 // @Summary LINE 登入

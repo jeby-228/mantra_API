@@ -1,26 +1,8 @@
 {
-    "schemes": [
-        "http",
-        "https"
-    ],
     "swagger": "2.0",
     "info": {
-        "description": "這是一個使用 Go、Gin 框架和 PostgreSQL 構建的 RESTful 和 GraphQL API 服務，提供會員管理功能和 JWT 認證",
-        "title": "Member API",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "version": "1.0"
+        "contact": {}
     },
-    "host": "localhost:9876",
-    "basePath": "/api/v1",
     "paths": {
         "/auth/line": {
             "post": {
@@ -64,6 +46,133 @@
                     },
                     "401": {
                         "description": "無效的 LINE 授權碼",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "服務器錯誤",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/line/bind": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "將當前登入用戶綁定到 LINE 帳號",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "認證"
+                ],
+                "summary": "綁定 LINE 帳號",
+                "parameters": [
+                    {
+                        "description": "LINE 綁定信息",
+                        "name": "lineBind",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.LineLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "綁定成功",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/controllers.User"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "請求參數錯誤",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未認證或 LINE 授權失敗",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "該 LINE 帳號已被其他會員綁定",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "服務器錯誤",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/line/unbind": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "解除當前登入用戶的 LINE 帳號綁定",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "認證"
+                ],
+                "summary": "解除綁定 LINE 帳號",
+                "responses": {
+                    "200": {
+                        "description": "解除綁定成功",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/controllers.User"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未認證",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -170,435 +279,6 @@
                 }
             }
         },
-        "/product": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "創建新產品，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "產品"
-                ],
-                "summary": "創建產品",
-                "parameters": [
-                    {
-                        "description": "產品信息",
-                        "name": "product",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controllers.CreateProductRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "創建成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/definitions/controllers.ProductResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "請求參數錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/product/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "根據產品 ID 獲取單個產品的詳細信息，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "產品"
-                ],
-                "summary": "根據 ID 獲取產品",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "example": 1,
-                        "description": "產品 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "獲取成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/definitions/controllers.ProductResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "無效的產品 ID",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "產品不存在",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "根據產品 ID 更新產品信息，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "產品"
-                ],
-                "summary": "更新產品",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "example": 1,
-                        "description": "產品 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "要更新的產品信息",
-                        "name": "product",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controllers.UpdateProductRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "更新成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/definitions/controllers.ProductResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "請求參數錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "產品不存在",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "根據產品 ID 軟刪除產品，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "產品"
-                ],
-                "summary": "刪除產品",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "example": 1,
-                        "description": "產品 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "刪除成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "無效的產品 ID",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "產品不存在",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/products": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "獲取產品列表，最多返回 100 條記錄，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "產品"
-                ],
-                "summary": "獲取所有產品",
-                "parameters": [
-                    {
-                        "maximum": 100,
-                        "minimum": 1,
-                        "type": "integer",
-                        "default": 50,
-                        "description": "限制返回數量",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 0,
-                        "type": "integer",
-                        "default": 0,
-                        "description": "偏移量",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "獲取成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/profile": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "獲取當前登入用戶的詳細信息，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用戶"
-                ],
-                "summary": "獲取當前用戶信息",
-                "responses": {
-                    "200": {
-                        "description": "獲取成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/definitions/controllers.User"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "用戶不存在",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/register": {
             "post": {
                 "description": "註冊新用戶，返回 JWT token 和用戶信息",
@@ -659,192 +339,6 @@
                     }
                 }
             }
-        },
-        "/user/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "根據會員 ID 獲取單個會員的詳細信息，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用戶"
-                ],
-                "summary": "根據 ID 獲取會員",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "example": 1,
-                        "description": "會員 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "獲取成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/definitions/controllers.User"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "會員不存在",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "根據會員 ID 刪除會員，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用戶"
-                ],
-                "summary": "刪除會員",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "example": 1,
-                        "description": "會員 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "刪除成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "無效的會員 ID",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/users": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "獲取會員列表，最多返回 50 條記錄，需要 JWT 認證",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用戶"
-                ],
-                "summary": "獲取所有會員",
-                "responses": {
-                    "200": {
-                        "description": "獲取成功",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/controllers.User"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未認證",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "服務器錯誤",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -857,37 +351,6 @@
                 },
                 "user": {
                     "$ref": "#/definitions/controllers.User"
-                }
-            }
-        },
-        "controllers.CreateProductRequest": {
-            "type": "object",
-            "required": [
-                "product_name",
-                "product_price",
-                "product_stock"
-            ],
-            "properties": {
-                "product_description": {
-                    "type": "string",
-                    "example": "最新款 iPhone"
-                },
-                "product_image": {
-                    "type": "string",
-                    "example": "https://example.com/image.jpg"
-                },
-                "product_name": {
-                    "type": "string",
-                    "example": "iPhone 15 Pro"
-                },
-                "product_price": {
-                    "type": "number",
-                    "example": 35900
-                },
-                "product_stock": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "example": 100
                 }
             }
         },
@@ -926,35 +389,6 @@
                 }
             }
         },
-        "controllers.ProductResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "product_description": {
-                    "type": "string",
-                    "example": "最新款 iPhone"
-                },
-                "product_image": {
-                    "type": "string",
-                    "example": "https://example.com/image.jpg"
-                },
-                "product_name": {
-                    "type": "string",
-                    "example": "iPhone 15 Pro"
-                },
-                "product_price": {
-                    "type": "number",
-                    "example": 35900
-                },
-                "product_stock": {
-                    "type": "integer",
-                    "example": 100
-                }
-            }
-        },
         "controllers.RegisterRequest": {
             "type": "object",
             "required": [
@@ -978,31 +412,6 @@
                 }
             }
         },
-        "controllers.UpdateProductRequest": {
-            "type": "object",
-            "properties": {
-                "product_description": {
-                    "type": "string",
-                    "example": "更新的描述"
-                },
-                "product_image": {
-                    "type": "string",
-                    "example": "https://example.com/new-image.jpg"
-                },
-                "product_name": {
-                    "type": "string",
-                    "example": "iPhone 15 Pro Max"
-                },
-                "product_price": {
-                    "type": "number",
-                    "example": 42900
-                },
-                "product_stock": {
-                    "type": "integer",
-                    "example": 50
-                }
-            }
-        },
         "controllers.User": {
             "type": "object",
             "properties": {
@@ -1019,14 +428,6 @@
                     "example": "張三"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "BearerAuth": {
-            "description": "JWT 認證，格式：Bearer {token}",
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
         }
     }
 }
