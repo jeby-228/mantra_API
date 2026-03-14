@@ -111,20 +111,14 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateMantra       func(childComplexity int, input model.CreateMantraInput) int
 		CreateMantraRecord func(childComplexity int, input model.CreateMantraRecordInput) int
-		CreateMember       func(childComplexity int, input model.CreateMemberInput) int
 		CreateMessageBoard func(childComplexity int, input model.CreateMessageBoardInput) int
-		CreateProduct      func(childComplexity int, input model.CreateProductInput) int
 		CreateQuoteRecord  func(childComplexity int, input model.CreateQuoteRecordInput) int
 		DeleteMantra       func(childComplexity int, id string) int
 		DeleteMantraRecord func(childComplexity int, id string) int
-		DeleteMember       func(childComplexity int, id string) int
 		DeleteMessageBoard func(childComplexity int, id string) int
-		DeleteProduct      func(childComplexity int, id string) int
 		DeleteQuoteRecord  func(childComplexity int, id string) int
 		EditMessageBoard   func(childComplexity int, id string, input model.EditMessageBoardInput) int
 		UpdateMantra       func(childComplexity int, id string, input model.UpdateMantraInput) int
-		UpdateMember       func(childComplexity int, id string, input model.UpdateMemberInput) int
-		UpdateProduct      func(childComplexity int, id string, input model.UpdateProductInput) int
 		UpdateQuoteRecord  func(childComplexity int, id string, input model.UpdateQuoteRecordInput) int
 	}
 
@@ -180,12 +174,6 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateMember(ctx context.Context, input model.CreateMemberInput) (*model.Member, error)
-	UpdateMember(ctx context.Context, id string, input model.UpdateMemberInput) (*model.Member, error)
-	DeleteMember(ctx context.Context, id string) (bool, error)
-	CreateProduct(ctx context.Context, input model.CreateProductInput) (*model.Product, error)
-	UpdateProduct(ctx context.Context, id string, input model.UpdateProductInput) (*model.Product, error)
-	DeleteProduct(ctx context.Context, id string) (bool, error)
 	CreateMantra(ctx context.Context, input model.CreateMantraInput) (*model.Mantra, error)
 	UpdateMantra(ctx context.Context, id string, input model.UpdateMantraInput) (*model.Mantra, error)
 	DeleteMantra(ctx context.Context, id string) (bool, error)
@@ -485,17 +473,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateMantraRecord(childComplexity, args["input"].(model.CreateMantraRecordInput)), true
-	case "Mutation.createMember":
-		if e.complexity.Mutation.CreateMember == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createMember_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateMember(childComplexity, args["input"].(model.CreateMemberInput)), true
 	case "Mutation.createMessageBoard":
 		if e.complexity.Mutation.CreateMessageBoard == nil {
 			break
@@ -507,17 +484,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateMessageBoard(childComplexity, args["input"].(model.CreateMessageBoardInput)), true
-	case "Mutation.createProduct":
-		if e.complexity.Mutation.CreateProduct == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createProduct_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateProduct(childComplexity, args["input"].(model.CreateProductInput)), true
 	case "Mutation.createQuoteRecord":
 		if e.complexity.Mutation.CreateQuoteRecord == nil {
 			break
@@ -551,17 +517,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteMantraRecord(childComplexity, args["id"].(string)), true
-	case "Mutation.deleteMember":
-		if e.complexity.Mutation.DeleteMember == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteMember_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteMember(childComplexity, args["id"].(string)), true
 	case "Mutation.deleteMessageBoard":
 		if e.complexity.Mutation.DeleteMessageBoard == nil {
 			break
@@ -573,17 +528,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteMessageBoard(childComplexity, args["id"].(string)), true
-	case "Mutation.deleteProduct":
-		if e.complexity.Mutation.DeleteProduct == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteProduct_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteProduct(childComplexity, args["id"].(string)), true
 	case "Mutation.deleteQuoteRecord":
 		if e.complexity.Mutation.DeleteQuoteRecord == nil {
 			break
@@ -617,28 +561,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateMantra(childComplexity, args["id"].(string), args["input"].(model.UpdateMantraInput)), true
-	case "Mutation.updateMember":
-		if e.complexity.Mutation.UpdateMember == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateMember_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateMember(childComplexity, args["id"].(string), args["input"].(model.UpdateMemberInput)), true
-	case "Mutation.updateProduct":
-		if e.complexity.Mutation.UpdateProduct == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateProduct_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateProduct(childComplexity, args["id"].(string), args["input"].(model.UpdateProductInput)), true
 	case "Mutation.updateQuoteRecord":
 		if e.complexity.Mutation.UpdateQuoteRecord == nil {
 			break
@@ -941,14 +863,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateMantraInput,
 		ec.unmarshalInputCreateMantraRecordInput,
-		ec.unmarshalInputCreateMemberInput,
 		ec.unmarshalInputCreateMessageBoardInput,
-		ec.unmarshalInputCreateProductInput,
 		ec.unmarshalInputCreateQuoteRecordInput,
 		ec.unmarshalInputEditMessageBoardInput,
 		ec.unmarshalInputUpdateMantraInput,
-		ec.unmarshalInputUpdateMemberInput,
-		ec.unmarshalInputUpdateProductInput,
 		ec.unmarshalInputUpdateQuoteRecordInput,
 	)
 	first := true
@@ -1088,32 +1006,10 @@ func (ec *executionContext) field_Mutation_createMantra_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMemberInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createMessageBoard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateMessageBoardInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMessageBoardInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createProduct_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateProductInput2mantra_APIᚋgraphqlᚋmodelᚐCreateProductInput)
 	if err != nil {
 		return nil, err
 	}
@@ -1154,29 +1050,7 @@ func (ec *executionContext) field_Mutation_deleteMantra_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_deleteMessageBoard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteProduct_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
@@ -1223,38 +1097,6 @@ func (ec *executionContext) field_Mutation_updateMantra_args(ctx context.Context
 	}
 	args["id"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateMantraInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMantraInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMemberInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateProduct_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateProductInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateProductInput)
 	if err != nil {
 		return nil, err
 	}
@@ -2633,312 +2475,6 @@ func (ec *executionContext) fieldContext_MessageBoardsResponse_offset(_ context.
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_createMember,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Mutation().CreateMember(ctx, fc.Args["input"].(model.CreateMemberInput))
-		},
-		nil,
-		ec.marshalNMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createMember(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Member_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Member_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Member_email(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Member_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Member_updated_at(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Member", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createMember_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_updateMember,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Mutation().UpdateMember(ctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateMemberInput))
-		},
-		nil,
-		ec.marshalNMember2ᚖmantra_APIᚋgraphqlᚋmodelᚐMember,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateMember(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Member_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Member_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Member_email(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Member_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Member_updated_at(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Member", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateMember_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_deleteMember,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Mutation().DeleteMember(ctx, fc.Args["id"].(string))
-		},
-		nil,
-		ec.marshalNBoolean2bool,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteMember(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteMember_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createProduct(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_createProduct,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Mutation().CreateProduct(ctx, fc.Args["input"].(model.CreateProductInput))
-		},
-		nil,
-		ec.marshalNProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Product_id(ctx, field)
-			case "product_name":
-				return ec.fieldContext_Product_product_name(ctx, field)
-			case "product_price":
-				return ec.fieldContext_Product_product_price(ctx, field)
-			case "product_description":
-				return ec.fieldContext_Product_product_description(ctx, field)
-			case "product_image":
-				return ec.fieldContext_Product_product_image(ctx, field)
-			case "product_stock":
-				return ec.fieldContext_Product_product_stock(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Product_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Product_updated_at(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createProduct_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateProduct(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_updateProduct,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Mutation().UpdateProduct(ctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateProductInput))
-		},
-		nil,
-		ec.marshalNProduct2ᚖmantra_APIᚋgraphqlᚋmodelᚐProduct,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Product_id(ctx, field)
-			case "product_name":
-				return ec.fieldContext_Product_product_name(ctx, field)
-			case "product_price":
-				return ec.fieldContext_Product_product_price(ctx, field)
-			case "product_description":
-				return ec.fieldContext_Product_product_description(ctx, field)
-			case "product_image":
-				return ec.fieldContext_Product_product_image(ctx, field)
-			case "product_stock":
-				return ec.fieldContext_Product_product_stock(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Product_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Product_updated_at(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateProduct_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteProduct(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_deleteProduct,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Mutation().DeleteProduct(ctx, fc.Args["id"].(string))
-		},
-		nil,
-		ec.marshalNBoolean2bool,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteProduct_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -6474,47 +6010,6 @@ func (ec *executionContext) unmarshalInputCreateMantraRecordInput(ctx context.Co
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputCreateMemberInput(ctx context.Context, obj any) (model.CreateMemberInput, error) {
-	var it model.CreateMemberInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"name", "email", "password"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputCreateMessageBoardInput(ctx context.Context, obj any) (model.CreateMessageBoardInput, error) {
 	var it model.CreateMessageBoardInput
 	asMap := map[string]any{}
@@ -6543,61 +6038,6 @@ func (ec *executionContext) unmarshalInputCreateMessageBoardInput(ctx context.Co
 				return it, err
 			}
 			it.Message = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context, obj any) (model.CreateProductInput, error) {
-	var it model.CreateProductInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"product_name", "product_price", "product_description", "product_image", "product_stock"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "product_name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductName = data
-		case "product_price":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_price"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductPrice = data
-		case "product_description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductDescription = data
-		case "product_image":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_image"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductImage = data
-		case "product_stock":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_stock"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductStock = data
 		}
 	}
 
@@ -6700,95 +6140,6 @@ func (ec *executionContext) unmarshalInputUpdateMantraInput(ctx context.Context,
 				return it, err
 			}
 			it.Description = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateMemberInput(ctx context.Context, obj any) (model.UpdateMemberInput, error) {
-	var it model.UpdateMemberInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"name", "email"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context, obj any) (model.UpdateProductInput, error) {
-	var it model.UpdateProductInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"product_name", "product_price", "product_description", "product_image", "product_stock"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "product_name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_name"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductName = data
-		case "product_price":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_price"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductPrice = data
-		case "product_description":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductDescription = data
-		case "product_image":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_image"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductImage = data
-		case "product_stock":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_stock"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ProductStock = data
 		}
 	}
 
@@ -7287,48 +6638,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createMember":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createMember(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "updateMember":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateMember(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "deleteMember":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteMember(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createProduct":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createProduct(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "updateProduct":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateProduct(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "deleteProduct":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteProduct(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createMantra":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMantra(ctx, field)
@@ -8333,18 +7642,8 @@ func (ec *executionContext) unmarshalNCreateMantraRecordInput2mantra_APIᚋgraph
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMemberInput(ctx context.Context, v any) (model.CreateMemberInput, error) {
-	res, err := ec.unmarshalInputCreateMemberInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNCreateMessageBoardInput2mantra_APIᚋgraphqlᚋmodelᚐCreateMessageBoardInput(ctx context.Context, v any) (model.CreateMessageBoardInput, error) {
 	res, err := ec.unmarshalInputCreateMessageBoardInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNCreateProductInput2mantra_APIᚋgraphqlᚋmodelᚐCreateProductInput(ctx context.Context, v any) (model.CreateProductInput, error) {
-	res, err := ec.unmarshalInputCreateProductInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -8604,10 +7903,6 @@ func (ec *executionContext) marshalNMantrasResponse2ᚖmantra_APIᚋgraphqlᚋmo
 	return ec._MantrasResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNMember2mantra_APIᚋgraphqlᚋmodelᚐMember(ctx context.Context, sel ast.SelectionSet, v model.Member) graphql.Marshaler {
-	return ec._Member(ctx, sel, &v)
-}
-
 func (ec *executionContext) marshalNMember2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐMemberᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Member) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -8732,10 +8027,6 @@ func (ec *executionContext) marshalNMessageBoardsResponse2ᚖmantra_APIᚋgraphq
 		return graphql.Null
 	}
 	return ec._MessageBoardsResponse(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNProduct2mantra_APIᚋgraphqlᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v model.Product) graphql.Marshaler {
-	return ec._Product(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNProduct2ᚕᚖmantra_APIᚋgraphqlᚋmodelᚐProductᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Product) graphql.Marshaler {
@@ -8896,16 +8187,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 
 func (ec *executionContext) unmarshalNUpdateMantraInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMantraInput(ctx context.Context, v any) (model.UpdateMantraInput, error) {
 	res, err := ec.unmarshalInputUpdateMantraInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNUpdateMemberInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateMemberInput(ctx context.Context, v any) (model.UpdateMemberInput, error) {
-	res, err := ec.unmarshalInputUpdateMemberInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNUpdateProductInput2mantra_APIᚋgraphqlᚋmodelᚐUpdateProductInput(ctx context.Context, v any) (model.UpdateProductInput, error) {
-	res, err := ec.unmarshalInputUpdateProductInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -9195,23 +8476,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
-}
-
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v any) (*float64, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalFloatContext(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	_ = sel
-	res := graphql.MarshalFloatContext(*v)
-	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v any) (*string, error) {

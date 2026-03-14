@@ -13,23 +13,9 @@ type CreateMantraRecordInput struct {
 	SaidAt   *string `json:"said_at,omitempty"`
 }
 
-type CreateMemberInput struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 type CreateMessageBoardInput struct {
 	QuoteRecordID string `json:"quote_record_id"`
 	Message       string `json:"message"`
-}
-
-type CreateProductInput struct {
-	ProductName        string  `json:"product_name"`
-	ProductPrice       float64 `json:"product_price"`
-	ProductDescription *string `json:"product_description,omitempty"`
-	ProductImage       *string `json:"product_image,omitempty"`
-	ProductStock       int     `json:"product_stock"`
 }
 
 type CreateQuoteRecordInput struct {
@@ -148,19 +134,6 @@ type QuoteRecordsResponse struct {
 type UpdateMantraInput struct {
 	Content     *string `json:"content,omitempty"`
 	Description *string `json:"description,omitempty"`
-}
-
-type UpdateMemberInput struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
-type UpdateProductInput struct {
-	ProductName        *string  `json:"product_name,omitempty"`
-	ProductPrice       *float64 `json:"product_price,omitempty"`
-	ProductDescription *string  `json:"product_description,omitempty"`
-	ProductImage       *string  `json:"product_image,omitempty"`
-	ProductStock       *int     `json:"product_stock,omitempty"`
 }
 
 type UpdateQuoteRecordInput struct {
