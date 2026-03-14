@@ -24,14 +24,6 @@ type CreateMessageBoardInput struct {
 	Message       string `json:"message"`
 }
 
-type CreateProductInput struct {
-	ProductName        string  `json:"product_name"`
-	ProductPrice       float64 `json:"product_price"`
-	ProductDescription *string `json:"product_description,omitempty"`
-	ProductImage       *string `json:"product_image,omitempty"`
-	ProductStock       int     `json:"product_stock"`
-}
-
 type CreateQuoteRecordInput struct {
 	JbName string  `json:"jb_name"`
 	Quote  string  `json:"quote"`
@@ -153,14 +145,6 @@ type UpdateMantraInput struct {
 type UpdateMemberInput struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
-}
-
-type UpdateProductInput struct {
-	ProductName        *string  `json:"product_name,omitempty"`
-	ProductPrice       *float64 `json:"product_price,omitempty"`
-	ProductDescription *string  `json:"product_description,omitempty"`
-	ProductImage       *string  `json:"product_image,omitempty"`
-	ProductStock       *int     `json:"product_stock,omitempty"`
 }
 
 type UpdateQuoteRecordInput struct {
