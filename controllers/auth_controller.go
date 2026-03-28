@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -273,7 +274,11 @@ func getLineProfile(c *gin.Context, code, redirectURI string) (*LineProfile, err
 	if err != nil {
 		return nil, errors.New("無法連接到 LINE")
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("close LINE token response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != 200 {
 		return nil, errors.New("無效的 LINE 授權碼")
@@ -305,7 +310,11 @@ func getLineProfile(c *gin.Context, code, redirectURI string) (*LineProfile, err
 	if err != nil {
 		return nil, errors.New("無法獲取 LINE 個人資料")
 	}
-	defer respProfile.Body.Close()
+	defer func() {
+		if err := respProfile.Body.Close(); err != nil {
+			log.Printf("close LINE profile response body: %v", err)
+		}
+	}()
 
 	var lineProfile LineProfile
 	if err := json.NewDecoder(respProfile.Body).Decode(&lineProfile); err != nil {

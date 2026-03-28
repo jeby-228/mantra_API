@@ -141,36 +141,6 @@ type MessageBoardsResponse {
 }
 
 type Mutation {
-  """
-  Create a new member
-  """
-  createMember(input: CreateMemberInput!): Member!
-
-  """
-  Update an existing member
-  """
-  updateMember(id: ID!, input: UpdateMemberInput!): Member!
-
-  """
-  Delete a member (soft delete)
-  """
-  deleteMember(id: ID!): Boolean!
-
-  # ========== Product Mutations ==========
-  """
-  Create a new product
-  """
-  createProduct(input: CreateProductInput!): Product!
-
-  """
-  Update an existing product
-  """
-  updateProduct(id: ID!, input: UpdateProductInput!): Product!
-
-  """
-  Delete a product (soft delete)
-  """
-  deleteProduct(id: ID!): Boolean!
 
   # ========== Mantra Mutations ==========
   createMantra(input: CreateMantraInput!): Mantra!
@@ -190,34 +160,6 @@ type Mutation {
   createMessageBoard(input: CreateMessageBoardInput!): MessageBoard!
   editMessageBoard(id: ID!, input: EditMessageBoardInput!): MessageBoard!
   deleteMessageBoard(id: ID!): Boolean!
-}
-
-input CreateMemberInput {
-  name: String!
-  email: String!
-  password: String!
-}
-
-input UpdateMemberInput {
-  name: String!
-  email: String!
-}
-
-# ========== Product Inputs ==========
-input CreateProductInput {
-  product_name: String!
-  product_price: Float!
-  product_description: String
-  product_image: String
-  product_stock: Int!
-}
-
-input UpdateProductInput {
-  product_name: String
-  product_price: Float
-  product_description: String
-  product_image: String
-  product_stock: Int
 }
 
 input CreateMantraInput {
