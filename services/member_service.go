@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"mantra_API/audit"
 	"mantra_API/auth"
 	"mantra_API/models"
 
@@ -37,13 +38,8 @@ func (s *MemberService) CreateMember(
 		return nil, err
 	}
 
-	now := time.Now()
 	member := &models.Member{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:         audit.NewCreateBase(creatorId),
 		Name:         name,
 		Email:        email,
 		PasswordHash: hash,
@@ -85,15 +81,9 @@ func (s *MemberService) UpdateMember(
 
 // DeleteMember 軟刪除會員
 func (s *MemberService) DeleteMember(id, deleterId uint) error {
-	now := time.Now()
 	result := s.DB.Model(&models.Member{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error

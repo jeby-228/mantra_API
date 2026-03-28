@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"mantra_API/audit"
 	"mantra_API/models"
 
 	"gorm.io/gorm"
@@ -27,13 +28,8 @@ func (s *QuoteRecordService) CreateQuoteRecord(
 		return nil, errors.New("名言內容不得為空")
 	}
 
-	now := time.Now()
 	record := &models.QuoteRecord{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:   audit.NewCreateBase(creatorId),
 		JBName: jbName,
 		Quote:  quote,
 		SaidAt: saidAt,
@@ -60,9 +56,7 @@ func (s *QuoteRecordService) UpdateQuoteRecord(
 		return nil, err
 	}
 
-	now := time.Now()
-	updates["last_modification_time"] = &now
-	updates["last_modifier_id"] = modifierId
+	audit.ApplyUpdateAudit(updates, modifierId)
 
 	if err := s.DB.Model(&record).Updates(updates).Error; err != nil {
 		return nil, err
@@ -77,15 +71,9 @@ func (s *QuoteRecordService) UpdateQuoteRecord(
 
 // DeleteQuoteRecord 軟刪除名言紀錄
 func (s *QuoteRecordService) DeleteQuoteRecord(id, deleterId uint) error {
-	now := time.Now()
 	result := s.DB.Model(&models.QuoteRecord{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"mantra_API/audit"
 	"mantra_API/models"
 
 	"gorm.io/gorm"
@@ -38,11 +39,7 @@ func (s *MantraRecordService) CreateMantraRecord(
 
 	now := time.Now()
 	record := &models.MantraRecord{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:     audit.NewCreateBaseAt(now, creatorId),
 		MantraID: mantraID,
 		Location: location,
 		SaidAt:   saidAt,
@@ -64,11 +61,7 @@ func (s *MantraRecordService) CreateMantraRecord(
 		)
 
 		dailyStat := &models.MantraDailyStat{
-			Base: models.Base{
-				CreationTime: now,
-				CreatorId:    creatorId,
-				IsDeleted:    false,
-			},
+			Base:     audit.NewCreateBaseAt(now, creatorId),
 			MantraID: mantraID,
 			StatDate: dateOnly,
 			Count:    1,
@@ -116,25 +109,20 @@ func (s *MantraRecordService) DeleteMantraRecord(id, deleterId uint) error {
 	now := time.Now()
 	return s.DB.Transaction(func(tx *gorm.DB) error {
 		// 軟刪除紀錄
-		if err := tx.Model(&record).Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		}).Error; err != nil {
+		if err := tx.Model(&record).Updates(audit.SoftDeleteFieldsAt(now, deleterId)).Error; err != nil {
 			return err
 		}
 
 		// 遞減每日統計 count（最低為 0）
+		auditUpdates := map[string]interface{}{
+			"count": gorm.Expr(
+				"CASE WHEN count > 0 THEN count - 1 ELSE 0 END",
+			),
+		}
+		audit.ApplyUpdateAudit(auditUpdates, deleterId)
 		return tx.Model(&models.MantraDailyStat{}).
 			Where("mantra_id = ? AND stat_date = ? AND is_deleted = ?", record.MantraID, dateOnly, false).
-			Updates(map[string]interface{}{
-				"count": gorm.Expr(
-					"CASE WHEN count > 0 THEN count - 1 ELSE 0 END",
-				),
-				"last_modification_time": &now,
-				"last_modifier_id":       deleterId,
-			}).Error
+			Updates(auditUpdates).Error
 	})
 }
 

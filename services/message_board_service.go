@@ -2,8 +2,8 @@ package services
 
 import (
 	"errors"
-	"time"
 
+	"mantra_API/audit"
 	"mantra_API/models"
 
 	"gorm.io/gorm"
@@ -38,13 +38,8 @@ func (s *MessageBoardService) CreateMessage(
 		return nil, err
 	}
 
-	now := time.Now()
 	msg := &models.MessageBoard{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:          audit.NewCreateBase(creatorId),
 		Message:       message,
 		QuoteRecordID: quoteRecordID,
 		IsEdited:      false,
@@ -75,13 +70,12 @@ func (s *MessageBoardService) EditMessage(
 		return nil, err
 	}
 
-	now := time.Now()
-	if err := s.DB.Model(&msg).Updates(map[string]interface{}{
-		"message":                message,
-		"is_edited":              true,
-		"last_modification_time": &now,
-		"last_modifier_id":       modifierId,
-	}).Error; err != nil {
+	updates := map[string]interface{}{
+		"message":   message,
+		"is_edited": true,
+	}
+	audit.ApplyUpdateAudit(updates, modifierId)
+	if err := s.DB.Model(&msg).Updates(updates).Error; err != nil {
 		return nil, err
 	}
 
@@ -94,15 +88,9 @@ func (s *MessageBoardService) EditMessage(
 
 // DeleteMessage 軟刪除留言
 func (s *MessageBoardService) DeleteMessage(id, deleterId uint) error {
-	now := time.Now()
 	result := s.DB.Model(&models.MessageBoard{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error

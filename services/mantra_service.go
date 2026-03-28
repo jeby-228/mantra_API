@@ -2,8 +2,8 @@ package services
 
 import (
 	"errors"
-	"time"
 
+	"mantra_API/audit"
 	"mantra_API/models"
 
 	"gorm.io/gorm"
@@ -26,13 +26,8 @@ func (s *MantraService) CreateMantra(
 		return nil, errors.New("口頭禪內容不得為空")
 	}
 
-	now := time.Now()
 	mantra := &models.Mantra{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:        audit.NewCreateBase(creatorId),
 		Content:     content,
 		Description: description,
 	}
@@ -58,9 +53,7 @@ func (s *MantraService) UpdateMantra(
 		return nil, err
 	}
 
-	now := time.Now()
-	updates["last_modification_time"] = &now
-	updates["last_modifier_id"] = modifierId
+	audit.ApplyUpdateAudit(updates, modifierId)
 
 	if err := s.DB.Model(&mantra).Updates(updates).Error; err != nil {
 		return nil, err
@@ -75,15 +68,9 @@ func (s *MantraService) UpdateMantra(
 
 // DeleteMantra 軟刪除口頭禪
 func (s *MantraService) DeleteMantra(id, deleterId uint) error {
-	now := time.Now()
 	result := s.DB.Model(&models.Mantra{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error
