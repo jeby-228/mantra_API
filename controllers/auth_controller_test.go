@@ -22,12 +22,7 @@ import (
 func newAuthControllerTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
 
-	db := testhelper.NewSQLiteTestDB(t)
-	if err := db.AutoMigrate(&models.Member{}); err != nil {
-		t.Fatalf("migrate member failed: %v", err)
-	}
-
-	return db
+	return testhelper.NewSQLiteTestDB(t)
 }
 
 func makeJSONPostRequest(t *testing.T, path string, body any) *http.Request {
