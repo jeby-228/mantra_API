@@ -37,9 +37,10 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// 將用戶信息存儲到 context
+		// 將用戶信息存儲到 Gin context（REST）並寫入 request.Context（GraphQL / 其他）
 		c.Set("user_id", claims.UserID)
 		c.Set("user_email", claims.Email)
+		c.Request = c.Request.WithContext(ContextWithUserID(c.Request.Context(), claims.UserID))
 
 		c.Next()
 	}

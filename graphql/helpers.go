@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"mantra_API/auth"
 	"mantra_API/graphql/model"
 	"mantra_API/models"
 )
@@ -162,10 +163,10 @@ func formatID(id uint) string {
 	return strconv.FormatUint(uint64(id), 10)
 }
 
-// getUserIDFromContext extracts user ID from context
+// getUserIDFromContext 從 JWT 注入的 context 取得使用者 ID（未登入則為 0）
 func getUserIDFromContext(ctx context.Context) uint {
-	userID, ok := ctx.Value("user_id").(int64)
-	if !ok || userID <= 0 {
+	userID, ok := auth.UserIDFromContext(ctx)
+	if !ok {
 		return 0
 	}
 	return uint(userID)

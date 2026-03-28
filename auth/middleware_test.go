@@ -92,6 +92,10 @@ func TestAuthMiddleware(t *testing.T) {
 			assert.True(t, exists)
 			assert.Equal(t, int64(1), userID)
 
+			uid, ok := UserIDFromContext(c.Request.Context())
+			assert.True(t, ok)
+			assert.Equal(t, int64(1), uid)
+
 			email, exists := c.Get("user_email")
 			assert.True(t, exists)
 			assert.Equal(t, "test@example.com", email)
