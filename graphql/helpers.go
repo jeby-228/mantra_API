@@ -169,6 +169,7 @@ func getUserIDFromContext(ctx context.Context) uint {
 	if !ok {
 		return 0
 	}
+	// #nosec G115 -- JWT user_id 已驗證為正整數，對應資料庫 member id
 	return uint(userID)
 }
 

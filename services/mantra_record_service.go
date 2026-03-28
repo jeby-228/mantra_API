@@ -109,7 +109,9 @@ func (s *MantraRecordService) DeleteMantraRecord(id, deleterId uint) error {
 	now := time.Now()
 	return s.DB.Transaction(func(tx *gorm.DB) error {
 		// 軟刪除紀錄
-		if err := tx.Model(&record).Updates(audit.SoftDeleteFieldsAt(now, deleterId)).Error; err != nil {
+		if err := tx.Model(&record).
+			Updates(audit.SoftDeleteFieldsAt(now, deleterId)).
+			Error; err != nil {
 			return err
 		}
 
