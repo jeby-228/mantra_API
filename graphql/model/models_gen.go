@@ -67,6 +67,9 @@ type MantrasResponse struct {
 
 // GraphQL Schema for Member API.
 // This SDL mirrors the implemented queries in the Go resolvers.
+//
+// Breaking changes (including removed Mutation fields) are documented in
+// CHANGELOG.md at the repository root.
 type Member struct {
 	ID        string  `json:"id"`
 	Name      string  `json:"name"`
