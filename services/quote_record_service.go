@@ -45,7 +45,7 @@ func (s *QuoteRecordService) CreateQuoteRecord(
 
 // UpdateQuoteRecord 更新名言紀錄
 func (s *QuoteRecordService) UpdateQuoteRecord(
-	id uint,
+	id uuid.UUID,
 	updates map[string]interface{},
 	modifierId uuid.UUID,
 ) (*models.QuoteRecord, error) {
@@ -71,7 +71,7 @@ func (s *QuoteRecordService) UpdateQuoteRecord(
 }
 
 // DeleteQuoteRecord 軟刪除名言紀錄
-func (s *QuoteRecordService) DeleteQuoteRecord(id uint, deleterId uuid.UUID) error {
+func (s *QuoteRecordService) DeleteQuoteRecord(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.QuoteRecord{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))
@@ -88,7 +88,7 @@ func (s *QuoteRecordService) DeleteQuoteRecord(id uint, deleterId uuid.UUID) err
 }
 
 // GetQuoteRecordByID 取得單一名言紀錄
-func (s *QuoteRecordService) GetQuoteRecordByID(id uint) (*models.QuoteRecord, error) {
+func (s *QuoteRecordService) GetQuoteRecordByID(id uuid.UUID) (*models.QuoteRecord, error) {
 	var record models.QuoteRecord
 	if err := s.DB.Where("is_deleted = ?", false).First(&record, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

@@ -40,7 +40,7 @@ func (s *MemberService) CreateMember(
 	}
 
 	member := &models.Member{
-		UUIDBase:     audit.NewUUIDCreateBase(creatorId),
+		Base:         audit.NewCreateBase(creatorId),
 		Name:         name,
 		Email:        email,
 		PasswordHash: hash,

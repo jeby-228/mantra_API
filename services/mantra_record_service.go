@@ -22,7 +22,7 @@ func NewMantraRecordService(db *gorm.DB) *MantraRecordService {
 
 // CreateMantraRecord 建立口頭禪紀錄，並同步更新每日統計（交易式）
 func (s *MantraRecordService) CreateMantraRecord(
-	mantraID uint,
+	mantraID uuid.UUID,
 	location string,
 	saidAt *time.Time,
 	creatorId uuid.UUID,
@@ -89,7 +89,7 @@ func (s *MantraRecordService) CreateMantraRecord(
 }
 
 // DeleteMantraRecord 軟刪除口頭禪紀錄，並同步遞減每日統計（交易式）
-func (s *MantraRecordService) DeleteMantraRecord(id uint, deleterId uuid.UUID) error {
+func (s *MantraRecordService) DeleteMantraRecord(id, deleterId uuid.UUID) error {
 	var record models.MantraRecord
 	if err := s.DB.Where("is_deleted = ?", false).First(&record, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -130,7 +130,7 @@ func (s *MantraRecordService) DeleteMantraRecord(id uint, deleterId uuid.UUID) e
 }
 
 // GetMantraRecordByID 取得單一口頭禪紀錄
-func (s *MantraRecordService) GetMantraRecordByID(id uint) (*models.MantraRecord, error) {
+func (s *MantraRecordService) GetMantraRecordByID(id uuid.UUID) (*models.MantraRecord, error) {
 	var record models.MantraRecord
 	if err := s.DB.Preload("Mantra").
 		Where("is_deleted = ?", false).
@@ -145,14 +145,14 @@ func (s *MantraRecordService) GetMantraRecordByID(id uint) (*models.MantraRecord
 
 // GetMantraRecords 取得特定口頭禪的紀錄列表（支援分頁）
 func (s *MantraRecordService) GetMantraRecords(
-	mantraID uint,
+	mantraID uuid.UUID,
 	limit, offset int,
 ) ([]models.MantraRecord, int64, error) {
 	var records []models.MantraRecord
 	var total int64
 
 	query := s.DB.Model(&models.MantraRecord{}).Where("is_deleted = ?", false)
-	if mantraID > 0 {
+	if mantraID != uuid.Nil {
 		query = query.Where("mantra_id = ?", mantraID)
 	}
 
@@ -173,7 +173,7 @@ func (s *MantraRecordService) GetMantraRecords(
 
 // GetDailyStats 取得口頭禪最近 N 天的每日統計
 func (s *MantraRecordService) GetDailyStats(
-	mantraID uint,
+	mantraID uuid.UUID,
 	days int,
 ) ([]models.MantraDailyStat, error) {
 	var stats []models.MantraDailyStat

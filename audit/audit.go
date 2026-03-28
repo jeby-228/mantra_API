@@ -43,17 +43,3 @@ func SoftDeleteFieldsAt(at time.Time, deleterID uuid.UUID) map[string]interface{
 func SoftDeleteFields(deleterID uuid.UUID) map[string]interface{} {
 	return SoftDeleteFieldsAt(time.Now(), deleterID)
 }
-
-// NewUUIDCreateBase 建立主鍵為 GUID 的實體之審計欄位（例如 Member）。
-func NewUUIDCreateBase(creatorID uuid.UUID) models.UUIDBase {
-	return NewUUIDCreateBaseAt(time.Now(), creatorID)
-}
-
-// NewUUIDCreateBaseAt 以指定時間建立 UUIDBase 審計欄位。
-func NewUUIDCreateBaseAt(at time.Time, creatorID uuid.UUID) models.UUIDBase {
-	return models.UUIDBase{
-		CreationTime: at,
-		CreatorId:    creatorID,
-		IsDeleted:    false,
-	}
-}

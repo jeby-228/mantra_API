@@ -94,7 +94,7 @@ func TestRegister_DuplicateEmail(t *testing.T) {
 		Name:         "Existing",
 		Email:        "exists@example.com",
 		PasswordHash: hash,
-		UUIDBase: models.UUIDBase{
+		Base: models.Base{
 			CreationTime: time.Now(),
 			CreatorId:    testCreatorUUID(),
 			IsDeleted:    false,
@@ -130,7 +130,7 @@ func TestLogin_Success(t *testing.T) {
 		Name:         "Tester",
 		Email:        "tester@example.com",
 		PasswordHash: hash,
-		UUIDBase: models.UUIDBase{
+		Base: models.Base{
 			CreationTime: time.Now(),
 			CreatorId:    testCreatorUUID(),
 			IsDeleted:    false,
@@ -172,7 +172,7 @@ func TestLogin_WrongPassword(t *testing.T) {
 		Name:         "Tester",
 		Email:        "tester2@example.com",
 		PasswordHash: hash,
-		UUIDBase: models.UUIDBase{
+		Base: models.Base{
 			CreationTime: time.Now(),
 			CreatorId:    testCreatorUUID(),
 			IsDeleted:    false,
@@ -204,7 +204,7 @@ func TestUnbindLine_Success(t *testing.T) {
 		Name:   "LineUser",
 		Email:  "line-user@example.com",
 		LineID: "line-abc-123",
-		UUIDBase: models.UUIDBase{
+		Base: models.Base{
 			CreationTime: time.Now(),
 			CreatorId:    testCreatorUUID(),
 			IsDeleted:    false,

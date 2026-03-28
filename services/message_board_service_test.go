@@ -18,7 +18,8 @@ func TestMessageBoardService_CreateMessage_QuoteNotFound(t *testing.T) {
 	db := testhelper.NewSQLiteTestDB(t)
 	svc := NewMessageBoardService(db)
 
-	msg, err := svc.CreateMessage("嗨", 999, mbCreator1)
+	fakeQuoteID := uuid.MustParse("00000000-0000-0000-0000-0000000003e7")
+	msg, err := svc.CreateMessage("嗨", fakeQuoteID, mbCreator1)
 	assert.Error(t, err)
 	assert.Nil(t, msg)
 }

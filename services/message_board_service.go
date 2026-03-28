@@ -21,7 +21,7 @@ func NewMessageBoardService(db *gorm.DB) *MessageBoardService {
 // CreateMessage 對名言紀錄新增留言
 func (s *MessageBoardService) CreateMessage(
 	message string,
-	quoteRecordID uint,
+	quoteRecordID uuid.UUID,
 	creatorId uuid.UUID,
 ) (*models.MessageBoard, error) {
 	if message == "" {
@@ -55,7 +55,7 @@ func (s *MessageBoardService) CreateMessage(
 
 // EditMessage 編輯留言內容，並標記 IsEdited = true
 func (s *MessageBoardService) EditMessage(
-	id uint,
+	id uuid.UUID,
 	message string,
 	modifierId uuid.UUID,
 ) (*models.MessageBoard, error) {
@@ -88,7 +88,7 @@ func (s *MessageBoardService) EditMessage(
 }
 
 // DeleteMessage 軟刪除留言
-func (s *MessageBoardService) DeleteMessage(id uint, deleterId uuid.UUID) error {
+func (s *MessageBoardService) DeleteMessage(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.MessageBoard{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))
@@ -105,7 +105,7 @@ func (s *MessageBoardService) DeleteMessage(id uint, deleterId uuid.UUID) error 
 }
 
 // GetMessageByID 取得單一留言
-func (s *MessageBoardService) GetMessageByID(id uint) (*models.MessageBoard, error) {
+func (s *MessageBoardService) GetMessageByID(id uuid.UUID) (*models.MessageBoard, error) {
 	var msg models.MessageBoard
 	if err := s.DB.Preload("QuoteRecord").
 		Where("is_deleted = ?", false).
@@ -120,7 +120,7 @@ func (s *MessageBoardService) GetMessageByID(id uint) (*models.MessageBoard, err
 
 // GetMessagesByQuoteRecord 取得特定名言的所有留言（支援分頁）
 func (s *MessageBoardService) GetMessagesByQuoteRecord(
-	quoteRecordID uint,
+	quoteRecordID uuid.UUID,
 	limit, offset int,
 ) ([]models.MessageBoard, int64, error) {
 	var messages []models.MessageBoard

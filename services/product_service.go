@@ -44,7 +44,7 @@ func (s *ProductService) CreateProduct(
 
 // UpdateProduct 更新產品資訊
 func (s *ProductService) UpdateProduct(
-	id uint,
+	id uuid.UUID,
 	updates map[string]interface{},
 	modifierId uuid.UUID,
 ) (*models.Product, error) {
@@ -71,7 +71,7 @@ func (s *ProductService) UpdateProduct(
 }
 
 // DeleteProduct 軟刪除產品
-func (s *ProductService) DeleteProduct(id uint, deleterId uuid.UUID) error {
+func (s *ProductService) DeleteProduct(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.Product{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))
@@ -88,7 +88,7 @@ func (s *ProductService) DeleteProduct(id uint, deleterId uuid.UUID) error {
 }
 
 // GetProductByID 取得單一產品
-func (s *ProductService) GetProductByID(id uint) (*models.Product, error) {
+func (s *ProductService) GetProductByID(id uuid.UUID) (*models.Product, error) {
 	var product models.Product
 	if err := s.DB.Where("is_deleted = ?", false).First(&product, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

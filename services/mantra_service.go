@@ -42,7 +42,7 @@ func (s *MantraService) CreateMantra(
 
 // UpdateMantra 更新口頭禪資訊
 func (s *MantraService) UpdateMantra(
-	id uint,
+	id uuid.UUID,
 	updates map[string]interface{},
 	modifierId uuid.UUID,
 ) (*models.Mantra, error) {
@@ -68,7 +68,7 @@ func (s *MantraService) UpdateMantra(
 }
 
 // DeleteMantra 軟刪除口頭禪
-func (s *MantraService) DeleteMantra(id uint, deleterId uuid.UUID) error {
+func (s *MantraService) DeleteMantra(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.Mantra{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))
@@ -85,7 +85,7 @@ func (s *MantraService) DeleteMantra(id uint, deleterId uuid.UUID) error {
 }
 
 // GetMantraByID 取得單一口頭禪
-func (s *MantraService) GetMantraByID(id uint) (*models.Mantra, error) {
+func (s *MantraService) GetMantraByID(id uuid.UUID) (*models.Mantra, error) {
 	var mantra models.Mantra
 	if err := s.DB.Where("is_deleted = ?", false).First(&mantra, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

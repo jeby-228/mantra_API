@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -11,13 +10,11 @@ type Member struct {
 	Email        string `gorm:"size:255;uniqueIndex;not null" json:"email"`
 	PasswordHash string `gorm:"size:255"                      json:"-"`
 	LineID       string `gorm:"size:255;uniqueIndex"          json:"line_id"`
-	UUIDBase
+	Base
 }
 
-// BeforeCreate 若未指定 ID 則自動產生 UUID（SQLite 測試環境亦適用）
+// BeforeCreate 若未指定 ID 則自動產生 UUID
 func (m *Member) BeforeCreate(tx *gorm.DB) error {
-	if m.ID == uuid.Nil {
-		m.ID = uuid.New()
-	}
+	EnsureBaseID(&m.Base)
 	return nil
 }

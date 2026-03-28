@@ -65,7 +65,7 @@ func TestMantraRecordService_GetDailyStats_InvalidDays(t *testing.T) {
 	db := testhelper.NewSQLiteTestDB(t)
 	svc := NewMantraRecordService(db)
 
-	stats, err := svc.GetDailyStats(1, 0)
+	stats, err := svc.GetDailyStats(uuid.MustParse("00000000-0000-0000-0000-000000000001"), 0)
 	assert.Error(t, err)
 	assert.Len(t, stats, 0)
 }

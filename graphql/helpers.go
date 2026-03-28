@@ -3,7 +3,6 @@ package graphql
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"mantra_API/auth"
@@ -45,7 +44,7 @@ func productDBToModel(p models.Product) *model.Product {
 		updated = &s
 	}
 	return &model.Product{
-		ID:                 formatID(p.ID),
+		ID:                 p.ID.String(),
 		ProductName:        p.ProductName,
 		ProductPrice:       p.ProductPrice,
 		ProductDescription: stringPtr(p.ProductDescription),
@@ -68,7 +67,7 @@ func mantraDBToModel(m models.Mantra) *model.Mantra {
 	}
 
 	return &model.Mantra{
-		ID:          formatID(m.ID),
+		ID:          m.ID.String(),
 		Content:     m.Content,
 		Description: stringPtr(m.Description),
 		CreatedAt:   created,
@@ -92,8 +91,8 @@ func mantraRecordDBToModel(r models.MantraRecord) *model.MantraRecord {
 	}
 
 	return &model.MantraRecord{
-		ID:        formatID(r.ID),
-		MantraID:  formatID(r.MantraID),
+		ID:        r.ID.String(),
+		MantraID:  r.MantraID.String(),
 		Location:  stringPtr(r.Location),
 		SaidAt:    saidAt,
 		CreatedAt: created,
@@ -103,7 +102,7 @@ func mantraRecordDBToModel(r models.MantraRecord) *model.MantraRecord {
 
 func mantraDailyStatDBToModel(s models.MantraDailyStat) *model.MantraDailyStat {
 	return &model.MantraDailyStat{
-		MantraID: formatID(s.MantraID),
+		MantraID: s.MantraID.String(),
 		StatDate: s.StatDate.Format("2006-01-02"),
 		Count:    s.Count,
 	}
@@ -125,7 +124,7 @@ func quoteRecordDBToModel(q models.QuoteRecord) *model.QuoteRecord {
 	}
 
 	return &model.QuoteRecord{
-		ID:        formatID(q.ID),
+		ID:        q.ID.String(),
 		JbName:    q.JBName,
 		Quote:     q.Quote,
 		SaidAt:    saidAt,
@@ -146,9 +145,9 @@ func messageBoardDBToModel(m models.MessageBoard) *model.MessageBoard {
 	}
 
 	return &model.MessageBoard{
-		ID:            formatID(m.ID),
+		ID:            m.ID.String(),
 		Message:       m.Message,
-		QuoteRecordID: formatID(m.QuoteRecordID),
+		QuoteRecordID: m.QuoteRecordID.String(),
 		IsEdited:      m.IsEdited,
 		CreatedAt:     created,
 		UpdatedAt:     updated,
@@ -158,11 +157,6 @@ func messageBoardDBToModel(m models.MessageBoard) *model.MessageBoard {
 // formatTime formats time to RFC3339 string
 func formatTime(t time.Time) string {
 	return t.UTC().Format(time.RFC3339)
-}
-
-// formatID converts uint ID to string
-func formatID(id uint) string {
-	return strconv.FormatUint(uint64(id), 10)
 }
 
 // getUserIDFromContext 從 JWT 注入的 context 取得會員 GUID（未登入則為 Nil）
@@ -190,12 +184,12 @@ func ptrToString(s *string) string {
 	return *s
 }
 
-func parseUintID(id string) (uint, error) {
-	parsed, err := strconv.ParseUint(id, 10, 32)
+func parseUUIDID(id string) (uuid.UUID, error) {
+	u, err := uuid.Parse(id)
 	if err != nil {
-		return 0, fmt.Errorf("無效的 ID")
+		return uuid.Nil, fmt.Errorf("無效的 ID")
 	}
-	return uint(parsed), nil
+	return u, nil
 }
 
 func parseOptionalTime(input *string) (*time.Time, error) {
