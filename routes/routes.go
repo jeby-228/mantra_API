@@ -31,7 +31,8 @@ func SetupRouter(router *gin.Engine) {
 			)
 			return
 		}
-		if c.Request.Method != http.MethodGet {
+		// OPTIONS 為 CORS 預檢，不可要求 JWT
+		if c.Request.Method != http.MethodGet && c.Request.Method != http.MethodOptions {
 			auth.AuthMiddleware()(c)
 			if c.IsAborted() {
 				return
