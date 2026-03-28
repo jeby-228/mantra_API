@@ -6,6 +6,7 @@ import (
 	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +24,7 @@ func (s *ProductService) CreateProduct(
 	price float64,
 	description, image string,
 	stock int,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.Product, error) {
 	product := &models.Product{
 		Base:               audit.NewCreateBase(creatorId),
@@ -45,7 +46,7 @@ func (s *ProductService) CreateProduct(
 func (s *ProductService) UpdateProduct(
 	id uint,
 	updates map[string]interface{},
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.Product, error) {
 	var product models.Product
 	if err := s.DB.Where("is_deleted = ?", false).First(&product, id).Error; err != nil {
@@ -70,7 +71,7 @@ func (s *ProductService) UpdateProduct(
 }
 
 // DeleteProduct 軟刪除產品
-func (s *ProductService) DeleteProduct(id, deleterId uint) error {
+func (s *ProductService) DeleteProduct(id uint, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.Product{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))

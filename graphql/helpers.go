@@ -9,6 +9,8 @@ import (
 	"mantra_API/auth"
 	"mantra_API/graphql/model"
 	"mantra_API/models"
+
+	"github.com/google/uuid"
 )
 
 // dbToModel converts DB Member to GraphQL model
@@ -23,7 +25,7 @@ func dbToModel(m models.Member) *model.Member {
 		updated = &s
 	}
 	return &model.Member{
-		ID:        formatID(m.ID),
+		ID:        m.ID.String(),
 		Name:      m.Name,
 		Email:     m.Email,
 		CreatedAt: created,
@@ -163,14 +165,13 @@ func formatID(id uint) string {
 	return strconv.FormatUint(uint64(id), 10)
 }
 
-// getUserIDFromContext 從 JWT 注入的 context 取得使用者 ID（未登入則為 0）
-func getUserIDFromContext(ctx context.Context) uint {
+// getUserIDFromContext 從 JWT 注入的 context 取得會員 GUID（未登入則為 Nil）
+func getUserIDFromContext(ctx context.Context) uuid.UUID {
 	userID, ok := auth.UserIDFromContext(ctx)
 	if !ok {
-		return 0
+		return uuid.Nil
 	}
-	// #nosec G115 -- JWT user_id 已驗證為正整數，對應資料庫 member id
-	return uint(userID)
+	return userID
 }
 
 // stringPtr converts string to *string pointer

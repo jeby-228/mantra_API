@@ -8,6 +8,7 @@ import (
 	"mantra_API/auth"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +23,7 @@ func NewMemberService(db *gorm.DB) *MemberService {
 // CreateMember 建立新會員
 func (s *MemberService) CreateMember(
 	name, email, password string,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.Member, error) {
 	// 檢查 email 是否已存在
 	var exists models.Member
@@ -39,7 +40,7 @@ func (s *MemberService) CreateMember(
 	}
 
 	member := &models.Member{
-		Base:         audit.NewCreateBase(creatorId),
+		UUIDBase:     audit.NewUUIDCreateBase(creatorId),
 		Name:         name,
 		Email:        email,
 		PasswordHash: hash,
@@ -54,9 +55,9 @@ func (s *MemberService) CreateMember(
 
 // UpdateMember 更新會員資訊
 func (s *MemberService) UpdateMember(
-	id uint,
+	id uuid.UUID,
 	name, email string,
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.Member, error) {
 	var member models.Member
 	if err := s.DB.Where("is_deleted = ?", false).First(&member, id).Error; err != nil {
@@ -80,7 +81,7 @@ func (s *MemberService) UpdateMember(
 }
 
 // DeleteMember 軟刪除會員
-func (s *MemberService) DeleteMember(id, deleterId uint) error {
+func (s *MemberService) DeleteMember(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.Member{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))
@@ -97,7 +98,7 @@ func (s *MemberService) DeleteMember(id, deleterId uint) error {
 }
 
 // GetMemberByID 取得單一會員
-func (s *MemberService) GetMemberByID(id uint) (*models.Member, error) {
+func (s *MemberService) GetMemberByID(id uuid.UUID) (*models.Member, error) {
 	var member models.Member
 	if err := s.DB.Where("is_deleted = ?", false).First(&member, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

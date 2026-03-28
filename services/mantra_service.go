@@ -6,6 +6,7 @@ import (
 	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +21,7 @@ func NewMantraService(db *gorm.DB) *MantraService {
 // CreateMantra 建立新口頭禪
 func (s *MantraService) CreateMantra(
 	content, description string,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.Mantra, error) {
 	if content == "" {
 		return nil, errors.New("口頭禪內容不得為空")
@@ -43,7 +44,7 @@ func (s *MantraService) CreateMantra(
 func (s *MantraService) UpdateMantra(
 	id uint,
 	updates map[string]interface{},
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.Mantra, error) {
 	var mantra models.Mantra
 	if err := s.DB.Where("is_deleted = ?", false).First(&mantra, id).Error; err != nil {
@@ -67,7 +68,7 @@ func (s *MantraService) UpdateMantra(
 }
 
 // DeleteMantra 軟刪除口頭禪
-func (s *MantraService) DeleteMantra(id, deleterId uint) error {
+func (s *MantraService) DeleteMantra(id uint, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.Mantra{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // AuthMiddleware JWT 認證中間件
@@ -37,10 +38,17 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		userUUID, err := uuid.Parse(claims.UserID)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "無效的 token"})
+			c.Abort()
+			return
+		}
+
 		// 將用戶信息存儲到 Gin context（REST）並寫入 request.Context（GraphQL / 其他）
-		c.Set("user_id", claims.UserID)
+		c.Set("user_id", userUUID)
 		c.Set("user_email", claims.Email)
-		c.Request = c.Request.WithContext(ContextWithUserID(c.Request.Context(), claims.UserID))
+		c.Request = c.Request.WithContext(ContextWithUserID(c.Request.Context(), userUUID))
 
 		c.Next()
 	}

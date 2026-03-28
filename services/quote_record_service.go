@@ -7,6 +7,7 @@ import (
 	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +23,7 @@ func NewQuoteRecordService(db *gorm.DB) *QuoteRecordService {
 func (s *QuoteRecordService) CreateQuoteRecord(
 	jbName, quote string,
 	saidAt time.Time,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.QuoteRecord, error) {
 	if quote == "" {
 		return nil, errors.New("名言內容不得為空")
@@ -46,7 +47,7 @@ func (s *QuoteRecordService) CreateQuoteRecord(
 func (s *QuoteRecordService) UpdateQuoteRecord(
 	id uint,
 	updates map[string]interface{},
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.QuoteRecord, error) {
 	var record models.QuoteRecord
 	if err := s.DB.Where("is_deleted = ?", false).First(&record, id).Error; err != nil {
@@ -70,7 +71,7 @@ func (s *QuoteRecordService) UpdateQuoteRecord(
 }
 
 // DeleteQuoteRecord 軟刪除名言紀錄
-func (s *QuoteRecordService) DeleteQuoteRecord(id, deleterId uint) error {
+func (s *QuoteRecordService) DeleteQuoteRecord(id uint, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.QuoteRecord{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))

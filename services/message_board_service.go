@@ -6,6 +6,7 @@ import (
 	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +22,7 @@ func NewMessageBoardService(db *gorm.DB) *MessageBoardService {
 func (s *MessageBoardService) CreateMessage(
 	message string,
 	quoteRecordID uint,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.MessageBoard, error) {
 	if message == "" {
 		return nil, errors.New("留言內容不得為空")
@@ -56,7 +57,7 @@ func (s *MessageBoardService) CreateMessage(
 func (s *MessageBoardService) EditMessage(
 	id uint,
 	message string,
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.MessageBoard, error) {
 	if message == "" {
 		return nil, errors.New("留言內容不得為空")
@@ -87,7 +88,7 @@ func (s *MessageBoardService) EditMessage(
 }
 
 // DeleteMessage 軟刪除留言
-func (s *MessageBoardService) DeleteMessage(id, deleterId uint) error {
+func (s *MessageBoardService) DeleteMessage(id uint, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.MessageBoard{}).
 		Where("id = ? AND is_deleted = ?", id, false).
 		Updates(audit.SoftDeleteFields(deleterId))

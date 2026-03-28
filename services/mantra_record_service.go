@@ -7,6 +7,7 @@ import (
 	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -24,7 +25,7 @@ func (s *MantraRecordService) CreateMantraRecord(
 	mantraID uint,
 	location string,
 	saidAt *time.Time,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.MantraRecord, error) {
 	// 確認口頭禪存在
 	var mantra models.Mantra
@@ -88,7 +89,7 @@ func (s *MantraRecordService) CreateMantraRecord(
 }
 
 // DeleteMantraRecord 軟刪除口頭禪紀錄，並同步遞減每日統計（交易式）
-func (s *MantraRecordService) DeleteMantraRecord(id, deleterId uint) error {
+func (s *MantraRecordService) DeleteMantraRecord(id uint, deleterId uuid.UUID) error {
 	var record models.MantraRecord
 	if err := s.DB.Where("is_deleted = ?", false).First(&record, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

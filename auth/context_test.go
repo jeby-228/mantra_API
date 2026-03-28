@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,8 +13,9 @@ func TestContextWithUserID(t *testing.T) {
 	_, ok := UserIDFromContext(ctx)
 	assert.False(t, ok)
 
-	ctx = ContextWithUserID(ctx, 42)
-	id, ok := UserIDFromContext(ctx)
+	id := uuid.MustParse("550e8400-e29b-41d4-a716-446655440042")
+	ctx = ContextWithUserID(ctx, id)
+	got, ok := UserIDFromContext(ctx)
 	assert.True(t, ok)
-	assert.Equal(t, int64(42), id)
+	assert.Equal(t, id, got)
 }
