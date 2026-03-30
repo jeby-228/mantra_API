@@ -187,7 +187,7 @@ func ptrToString(s *string) string {
 func parseUUIDID(id string) (uuid.UUID, error) {
 	u, err := uuid.Parse(id)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("無效的 ID")
+		return uuid.Nil, fmt.Errorf("無效的 ID %q，需為 UUID 格式: %w", id, err)
 	}
 	return u, nil
 }
