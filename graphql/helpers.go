@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -159,13 +160,16 @@ func formatTime(t time.Time) string {
 	return t.UTC().Format(time.RFC3339)
 }
 
-// getUserIDFromContext 從 JWT 注入的 context 取得會員 GUID（未登入則為 Nil）
-func getUserIDFromContext(ctx context.Context) uuid.UUID {
+// ErrUnauthorized 表示未登入、JWT 無效或 context 未注入使用者 ID。
+var ErrUnauthorized = errors.New("未登入或無效的認證憑證")
+
+// requireUserID 從 JWT 注入的 context 取得會員 GUID；未認證則回傳錯誤（禁止以 uuid.Nil 當建立者）。
+func requireUserID(ctx context.Context) (uuid.UUID, error) {
 	userID, ok := auth.UserIDFromContext(ctx)
 	if !ok {
-		return uuid.Nil
+		return uuid.Nil, ErrUnauthorized
 	}
-	return userID
+	return userID, nil
 }
 
 // stringPtr converts string to *string pointer

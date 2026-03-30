@@ -18,7 +18,10 @@ import (
 // CreateMantra is the resolver for the createMantra field.
 func (r *mutationResolver) CreateMantra(ctx context.Context, input model.CreateMantraInput) (*model.Mantra, error) {
 	svc := services.NewMantraService(r.DB)
-	creatorID := getUserIDFromContext(ctx)
+	creatorID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	mantra, err := svc.CreateMantra(input.Content, ptrToString(input.Description), creatorID)
 	if err != nil {
@@ -44,7 +47,10 @@ func (r *mutationResolver) UpdateMantra(ctx context.Context, id string, input mo
 		updates["description"] = *input.Description
 	}
 
-	modifierID := getUserIDFromContext(ctx)
+	modifierID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	mantra, err := svc.UpdateMantra(mantraID, updates, modifierID)
 	if err != nil {
 		return nil, err
@@ -61,7 +67,10 @@ func (r *mutationResolver) DeleteMantra(ctx context.Context, id string) (bool, e
 		return false, err
 	}
 
-	deleterID := getUserIDFromContext(ctx)
+	deleterID, err := requireUserID(ctx)
+	if err != nil {
+		return false, err
+	}
 	if err := svc.DeleteMantra(mantraID, deleterID); err != nil {
 		return false, err
 	}
@@ -77,12 +86,16 @@ func (r *mutationResolver) CreateMantraRecord(ctx context.Context, input model.C
 		return nil, err
 	}
 
+	creatorID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	saidAt, err := parseOptionalTime(input.SaidAt)
 	if err != nil {
 		return nil, err
 	}
 
-	creatorID := getUserIDFromContext(ctx)
 	record, err := svc.CreateMantraRecord(mantraID, ptrToString(input.Location), saidAt, creatorID)
 	if err != nil {
 		return nil, err
@@ -99,7 +112,10 @@ func (r *mutationResolver) DeleteMantraRecord(ctx context.Context, id string) (b
 		return false, err
 	}
 
-	deleterID := getUserIDFromContext(ctx)
+	deleterID, err := requireUserID(ctx)
+	if err != nil {
+		return false, err
+	}
 	if err := svc.DeleteMantraRecord(recordID, deleterID); err != nil {
 		return false, err
 	}
@@ -110,7 +126,10 @@ func (r *mutationResolver) DeleteMantraRecord(ctx context.Context, id string) (b
 // CreateQuoteRecord is the resolver for the createQuoteRecord field.
 func (r *mutationResolver) CreateQuoteRecord(ctx context.Context, input model.CreateQuoteRecordInput) (*model.QuoteRecord, error) {
 	svc := services.NewQuoteRecordService(r.DB)
-	creatorID := getUserIDFromContext(ctx)
+	creatorID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	saidAtParsed, err := parseOptionalTime(input.SaidAt)
 	if err != nil {
@@ -155,7 +174,10 @@ func (r *mutationResolver) UpdateQuoteRecord(ctx context.Context, id string, inp
 		}
 	}
 
-	modifierID := getUserIDFromContext(ctx)
+	modifierID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	record, err := svc.UpdateQuoteRecord(recordID, updates, modifierID)
 	if err != nil {
 		return nil, err
@@ -172,7 +194,10 @@ func (r *mutationResolver) DeleteQuoteRecord(ctx context.Context, id string) (bo
 		return false, err
 	}
 
-	deleterID := getUserIDFromContext(ctx)
+	deleterID, err := requireUserID(ctx)
+	if err != nil {
+		return false, err
+	}
 	if err := svc.DeleteQuoteRecord(recordID, deleterID); err != nil {
 		return false, err
 	}
@@ -188,7 +213,10 @@ func (r *mutationResolver) CreateMessageBoard(ctx context.Context, input model.C
 		return nil, err
 	}
 
-	creatorID := getUserIDFromContext(ctx)
+	creatorID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	message, err := svc.CreateMessage(input.Message, quoteRecordID, creatorID)
 	if err != nil {
 		return nil, err
@@ -205,7 +233,10 @@ func (r *mutationResolver) EditMessageBoard(ctx context.Context, id string, inpu
 		return nil, err
 	}
 
-	modifierID := getUserIDFromContext(ctx)
+	modifierID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	message, err := svc.EditMessage(messageID, input.Message, modifierID)
 	if err != nil {
 		return nil, err
@@ -222,7 +253,10 @@ func (r *mutationResolver) DeleteMessageBoard(ctx context.Context, id string) (b
 		return false, err
 	}
 
-	deleterID := getUserIDFromContext(ctx)
+	deleterID, err := requireUserID(ctx)
+	if err != nil {
+		return false, err
+	}
 	if err := svc.DeleteMessage(messageID, deleterID); err != nil {
 		return false, err
 	}
