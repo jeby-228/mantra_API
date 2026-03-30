@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"mantra_API/audit"
 	"mantra_API/auth"
 	"mantra_API/internal/testhelper"
 	"mantra_API/models"
@@ -78,6 +79,7 @@ func TestRegister_Success(t *testing.T) {
 	var member models.Member
 	err = testDB.Where("email = ?", "jeby@example.com").First(&member).Error
 	assert.NoError(t, err)
+	assert.Equal(t, audit.SelfRegistrationCreatorID, member.CreatorId)
 	assert.NotEqual(t, "password123", member.PasswordHash)
 	assert.NotEmpty(t, member.PasswordHash)
 }

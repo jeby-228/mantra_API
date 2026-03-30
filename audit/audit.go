@@ -8,6 +8,9 @@ import (
 	"github.com/google/uuid"
 )
 
+// SelfRegistrationCreatorID 公開註冊 API 建立會員時寫入的 CreatorId（註冊當下尚無既有會員可指為建立者，與 uuid.Nil 區隔以利稽核）。
+var SelfRegistrationCreatorID = uuid.MustParse("00000000-0000-4000-8000-000000000001")
+
 // NewCreateBase 建立寫入時的審計欄位（建立者、建立時間）。
 func NewCreateBase(creatorID uuid.UUID) models.Base {
 	return NewCreateBaseAt(time.Now(), creatorID)
@@ -22,10 +25,14 @@ func NewCreateBaseAt(at time.Time, creatorID uuid.UUID) models.Base {
 	}
 }
 
-// ApplyUpdateAudit 在 Updates map 上附加最後修改者與修改時間。
+// ApplyUpdateAudit 在 Updates map 上附加最後修改者與修改時間（時間為呼叫當下）。
 func ApplyUpdateAudit(updates map[string]interface{}, modifierID uuid.UUID) {
-	now := time.Now()
-	updates["last_modification_time"] = &now
+	ApplyUpdateAuditAt(updates, modifierID, time.Now())
+}
+
+// ApplyUpdateAuditAt 在 Updates map 上附加最後修改者與修改時間（同一交易內請傳入共用的 at，與 SoftDeleteFieldsAt 等一致）。
+func ApplyUpdateAuditAt(updates map[string]interface{}, modifierID uuid.UUID, at time.Time) {
+	updates["last_modification_time"] = at
 	updates["last_modifier_id"] = modifierID
 }
 

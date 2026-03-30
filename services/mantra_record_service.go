@@ -122,7 +122,7 @@ func (s *MantraRecordService) DeleteMantraRecord(id, deleterId uuid.UUID) error 
 				"CASE WHEN count > 0 THEN count - 1 ELSE 0 END",
 			),
 		}
-		audit.ApplyUpdateAudit(auditUpdates, deleterId)
+		audit.ApplyUpdateAuditAt(auditUpdates, deleterId, now)
 		return tx.Model(&models.MantraDailyStat{}).
 			Where("mantra_id = ? AND stat_date = ? AND is_deleted = ?", record.MantraID, dateOnly, false).
 			Updates(auditUpdates).Error

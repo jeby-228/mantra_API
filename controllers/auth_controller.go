@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"mantra_API/audit"
 	"mantra_API/auth"
 	"mantra_API/models"
 	"mantra_API/services"
@@ -79,8 +80,13 @@ func Register(input *gin.Context) {
 	// 使用 Service 層建立會員（自動處理密碼加密、審計欄位等）
 	svc := services.NewMemberService(db)
 
-	// 註冊時使用 Nil UUID 表示自行註冊（無建立者）
-	member, err := svc.CreateMember(req.Name, req.Email, req.Password, uuid.Nil)
+	// 自行註冊無既有會員可當建立者，使用固定系統 UUID 以利稽核（見 audit.SelfRegistrationCreatorID）
+	member, err := svc.CreateMember(
+		req.Name,
+		req.Email,
+		req.Password,
+		audit.SelfRegistrationCreatorID,
+	)
 	if err != nil {
 		if err.Error() == "email 已被使用" {
 			input.JSON(http.StatusConflict, gin.H{"error": "該電子郵件已被註冊"})
