@@ -24,6 +24,12 @@ import (
 
 type roundTripFunc func(*http.Request) (*http.Response, error)
 
+const (
+	// #nosec G101 -- This is a public LINE API path, not credentials.
+	lineTokenPath   = "/oauth2/v2.1/token"
+	lineProfilePath = "/v2/profile"
+)
+
 func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return f(req)
 }
@@ -304,7 +310,7 @@ func TestLineLogin_InvalidAuthorizationCode(t *testing.T) {
 	t.Setenv("LINE_CHANNEL_SECRET", "test-channel-secret")
 
 	withMockLineAPI(t, func(req *http.Request) (*http.Response, error) {
-		if req.URL.Path == "/oauth2/v2.1/token" {
+		if req.URL.Path == lineTokenPath {
 			return jsonResponse(http.StatusBadRequest, `{"error":"invalid_grant"}`), nil
 		}
 		t.Fatalf("unexpected LINE request path: %s", req.URL.Path)
@@ -335,10 +341,16 @@ func TestLineLogin_CreatesMemberOnFirstLogin(t *testing.T) {
 
 	withMockLineAPI(t, func(req *http.Request) (*http.Response, error) {
 		switch req.URL.Path {
-		case "/oauth2/v2.1/token":
-			return jsonResponse(http.StatusOK, `{"access_token":"line-access-token","id_token":"line-id-token"}`), nil
-		case "/v2/profile":
-			return jsonResponse(http.StatusOK, `{"userId":"line-u-001","displayName":"Line First User","pictureUrl":"https://example.com/p.png"}`), nil
+		case lineTokenPath:
+			return jsonResponse(
+				http.StatusOK,
+				`{"access_token":"line-access-token","id_token":"line-id-token"}`,
+			), nil
+		case lineProfilePath:
+			return jsonResponse(
+				http.StatusOK,
+				`{"userId":"line-u-001","displayName":"Line First User","pictureUrl":"https://example.com/p.png"}`,
+			), nil
 		default:
 			t.Fatalf("unexpected LINE request path: %s", req.URL.Path)
 			return nil, nil
@@ -404,10 +416,16 @@ func TestBindLine_ConflictWhenLineIDBoundByAnotherMember(t *testing.T) {
 
 	withMockLineAPI(t, func(req *http.Request) (*http.Response, error) {
 		switch req.URL.Path {
-		case "/oauth2/v2.1/token":
-			return jsonResponse(http.StatusOK, `{"access_token":"line-access-token","id_token":"line-id-token"}`), nil
-		case "/v2/profile":
-			return jsonResponse(http.StatusOK, `{"userId":"line-conflict-001","displayName":"Conflict User","pictureUrl":"https://example.com/p.png"}`), nil
+		case lineTokenPath:
+			return jsonResponse(
+				http.StatusOK,
+				`{"access_token":"line-access-token","id_token":"line-id-token"}`,
+			), nil
+		case lineProfilePath:
+			return jsonResponse(
+				http.StatusOK,
+				`{"userId":"line-conflict-001","displayName":"Conflict User","pictureUrl":"https://example.com/p.png"}`,
+			), nil
 		default:
 			t.Fatalf("unexpected LINE request path: %s", req.URL.Path)
 			return nil, nil
@@ -460,13 +478,19 @@ func TestBindLine_IdempotentWhenAlreadyBoundToCurrentMember(t *testing.T) {
 	var mu sync.Mutex
 	withMockLineAPI(t, func(req *http.Request) (*http.Response, error) {
 		switch req.URL.Path {
-		case "/oauth2/v2.1/token":
-			return jsonResponse(http.StatusOK, `{"access_token":"line-access-token","id_token":"line-id-token"}`), nil
-		case "/v2/profile":
+		case lineTokenPath:
+			return jsonResponse(
+				http.StatusOK,
+				`{"access_token":"line-access-token","id_token":"line-id-token"}`,
+			), nil
+		case lineProfilePath:
 			mu.Lock()
 			profileRequestCount++
 			mu.Unlock()
-			return jsonResponse(http.StatusOK, `{"userId":"line-idempotent-001","displayName":"Bound User","pictureUrl":"https://example.com/p.png"}`), nil
+			return jsonResponse(
+				http.StatusOK,
+				`{"userId":"line-idempotent-001","displayName":"Bound User","pictureUrl":"https://example.com/p.png"}`,
+			), nil
 		default:
 			t.Fatalf("unexpected LINE request path: %s", req.URL.Path)
 			return nil, nil
