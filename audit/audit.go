@@ -32,7 +32,7 @@ func ApplyUpdateAudit(updates map[string]interface{}, modifierID uuid.UUID) {
 
 // ApplyUpdateAuditAt 在 Updates map 上附加最後修改者與修改時間（同一交易內請傳入共用的 at，與 SoftDeleteFieldsAt 等一致）。
 func ApplyUpdateAuditAt(updates map[string]interface{}, modifierID uuid.UUID, at time.Time) {
-	updates["last_modification_time"] = at
+	updates["last_modification_time"] = &at
 	updates["last_modifier_id"] = modifierID
 }
 
