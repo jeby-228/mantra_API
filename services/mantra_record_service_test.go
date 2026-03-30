@@ -7,7 +7,13 @@ import (
 	"mantra_API/internal/testhelper"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+)
+
+var (
+	mrCreator1 = uuid.MustParse("00000000-0000-0000-0000-000000000001")
+	mrCreator9 = uuid.MustParse("00000000-0000-0000-0000-000000000009")
 )
 
 func TestMantraRecordService_CreateMantraRecord_UpsertDailyStat(t *testing.T) {
@@ -16,11 +22,11 @@ func TestMantraRecordService_CreateMantraRecord_UpsertDailyStat(t *testing.T) {
 	svc := NewMantraRecordService(db)
 
 	saidAt := time.Date(2026, 3, 11, 10, 0, 0, 0, time.Local)
-	first, err := svc.CreateMantraRecord(mantra.ID, "辦公室", &saidAt, 1)
+	first, err := svc.CreateMantraRecord(mantra.ID, "辦公室", &saidAt, mrCreator1)
 	assert.NoError(t, err)
 	assert.NotZero(t, first.ID)
 
-	second, err := svc.CreateMantraRecord(mantra.ID, "會議室", &saidAt, 1)
+	second, err := svc.CreateMantraRecord(mantra.ID, "會議室", &saidAt, mrCreator1)
 	assert.NoError(t, err)
 	assert.NotZero(t, second.ID)
 
@@ -37,10 +43,10 @@ func TestMantraRecordService_DeleteMantraRecord_DecreaseDailyStat(t *testing.T) 
 	svc := NewMantraRecordService(db)
 
 	saidAt := time.Date(2026, 3, 11, 8, 0, 0, 0, time.Local)
-	record, err := svc.CreateMantraRecord(mantra.ID, "A", &saidAt, 1)
+	record, err := svc.CreateMantraRecord(mantra.ID, "A", &saidAt, mrCreator1)
 	assert.NoError(t, err)
 
-	err = svc.DeleteMantraRecord(record.ID, 9)
+	err = svc.DeleteMantraRecord(record.ID, mrCreator9)
 	assert.NoError(t, err)
 
 	var deleted models.MantraRecord
@@ -59,7 +65,7 @@ func TestMantraRecordService_GetDailyStats_InvalidDays(t *testing.T) {
 	db := testhelper.NewSQLiteTestDB(t)
 	svc := NewMantraRecordService(db)
 
-	stats, err := svc.GetDailyStats(1, 0)
+	stats, err := svc.GetDailyStats(uuid.MustParse("00000000-0000-0000-0000-000000000001"), 0)
 	assert.Error(t, err)
 	assert.Len(t, stats, 0)
 }

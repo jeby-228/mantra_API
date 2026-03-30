@@ -6,15 +6,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 	"time"
 
+	"mantra_API/audit"
 	"mantra_API/auth"
 	"mantra_API/internal/testhelper"
 	"mantra_API/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -43,15 +44,8 @@ func makeJSONPostRequest(t *testing.T, path string, body any) *http.Request {
 	return req
 }
 
-func uintIDToInt64(t *testing.T, v uint) int64 {
-	t.Helper()
-
-	id, err := strconv.ParseInt(strconv.FormatUint(uint64(v), 10), 10, 64)
-	if err != nil {
-		t.Fatalf("convert uint id to int64 failed: %v", err)
-	}
-
-	return id
+func testCreatorUUID() uuid.UUID {
+	return uuid.MustParse("00000000-0000-0000-0000-000000000001")
 }
 
 func TestRegister_Success(t *testing.T) {
@@ -79,10 +73,13 @@ func TestRegister_Success(t *testing.T) {
 	assert.NotEmpty(t, resp.Token)
 	assert.Equal(t, "Jeby", resp.User.Name)
 	assert.Equal(t, "jeby@example.com", resp.User.Email)
+	_, err = uuid.Parse(resp.User.ID)
+	assert.NoError(t, err)
 
 	var member models.Member
 	err = testDB.Where("email = ?", "jeby@example.com").First(&member).Error
 	assert.NoError(t, err)
+	assert.Equal(t, audit.SelfRegistrationCreatorID, member.CreatorId)
 	assert.NotEqual(t, "password123", member.PasswordHash)
 	assert.NotEmpty(t, member.PasswordHash)
 }
@@ -101,7 +98,7 @@ func TestRegister_DuplicateEmail(t *testing.T) {
 		PasswordHash: hash,
 		Base: models.Base{
 			CreationTime: time.Now(),
-			CreatorId:    1,
+			CreatorId:    testCreatorUUID(),
 			IsDeleted:    false,
 		},
 	}
@@ -137,7 +134,7 @@ func TestLogin_Success(t *testing.T) {
 		PasswordHash: hash,
 		Base: models.Base{
 			CreationTime: time.Now(),
-			CreatorId:    1,
+			CreatorId:    testCreatorUUID(),
 			IsDeleted:    false,
 		},
 	}
@@ -162,6 +159,7 @@ func TestLogin_Success(t *testing.T) {
 	assert.NotEmpty(t, resp.Token)
 	assert.Equal(t, "Tester", resp.User.Name)
 	assert.Equal(t, "tester@example.com", resp.User.Email)
+	assert.Equal(t, seed.ID.String(), resp.User.ID)
 }
 
 func TestLogin_WrongPassword(t *testing.T) {
@@ -178,7 +176,7 @@ func TestLogin_WrongPassword(t *testing.T) {
 		PasswordHash: hash,
 		Base: models.Base{
 			CreationTime: time.Now(),
-			CreatorId:    1,
+			CreatorId:    testCreatorUUID(),
 			IsDeleted:    false,
 		},
 	}
@@ -210,7 +208,7 @@ func TestUnbindLine_Success(t *testing.T) {
 		LineID: "line-abc-123",
 		Base: models.Base{
 			CreationTime: time.Now(),
-			CreatorId:    1,
+			CreatorId:    testCreatorUUID(),
 			IsDeleted:    false,
 		},
 	}
@@ -219,7 +217,7 @@ func TestUnbindLine_Success(t *testing.T) {
 	router := gin.New()
 	router.POST("/auth/line/unbind", func(c *gin.Context) {
 		// Simulate auth middleware putting user_id into context.
-		c.Set("user_id", uintIDToInt64(t, seed.ID))
+		c.Set("user_id", seed.ID)
 		UnbindLine(c)
 	})
 

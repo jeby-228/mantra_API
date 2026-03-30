@@ -8,6 +8,7 @@ import (
 
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -46,7 +47,7 @@ func MustCreateMantra(t *testing.T, db *gorm.DB, content string) models.Mantra {
 	m := models.Mantra{
 		Base: models.Base{
 			CreationTime: now,
-			CreatorId:    1,
+			CreatorId:    uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 			IsDeleted:    false,
 		},
 		Content:     content,
@@ -64,7 +65,7 @@ func MustCreateQuote(t *testing.T, db *gorm.DB, quote string) models.QuoteRecord
 	q := models.QuoteRecord{
 		Base: models.Base{
 			CreationTime: now,
-			CreatorId:    1,
+			CreatorId:    uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 			IsDeleted:    false,
 		},
 		JBName: "tester",

@@ -4,8 +4,10 @@ import (
 	"errors"
 	"time"
 
+	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -21,19 +23,14 @@ func NewQuoteRecordService(db *gorm.DB) *QuoteRecordService {
 func (s *QuoteRecordService) CreateQuoteRecord(
 	jbName, quote string,
 	saidAt time.Time,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.QuoteRecord, error) {
 	if quote == "" {
 		return nil, errors.New("名言內容不得為空")
 	}
 
-	now := time.Now()
 	record := &models.QuoteRecord{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:   audit.NewCreateBase(creatorId),
 		JBName: jbName,
 		Quote:  quote,
 		SaidAt: saidAt,
@@ -48,9 +45,9 @@ func (s *QuoteRecordService) CreateQuoteRecord(
 
 // UpdateQuoteRecord 更新名言紀錄
 func (s *QuoteRecordService) UpdateQuoteRecord(
-	id uint,
+	id uuid.UUID,
 	updates map[string]interface{},
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.QuoteRecord, error) {
 	var record models.QuoteRecord
 	if err := s.DB.Where("is_deleted = ?", false).First(&record, id).Error; err != nil {
@@ -60,9 +57,7 @@ func (s *QuoteRecordService) UpdateQuoteRecord(
 		return nil, err
 	}
 
-	now := time.Now()
-	updates["last_modification_time"] = &now
-	updates["last_modifier_id"] = modifierId
+	audit.ApplyUpdateAudit(updates, modifierId)
 
 	if err := s.DB.Model(&record).Updates(updates).Error; err != nil {
 		return nil, err
@@ -76,16 +71,10 @@ func (s *QuoteRecordService) UpdateQuoteRecord(
 }
 
 // DeleteQuoteRecord 軟刪除名言紀錄
-func (s *QuoteRecordService) DeleteQuoteRecord(id, deleterId uint) error {
-	now := time.Now()
+func (s *QuoteRecordService) DeleteQuoteRecord(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.QuoteRecord{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error
@@ -99,7 +88,7 @@ func (s *QuoteRecordService) DeleteQuoteRecord(id, deleterId uint) error {
 }
 
 // GetQuoteRecordByID 取得單一名言紀錄
-func (s *QuoteRecordService) GetQuoteRecordByID(id uint) (*models.QuoteRecord, error) {
+func (s *QuoteRecordService) GetQuoteRecordByID(id uuid.UUID) (*models.QuoteRecord, error) {
 	var record models.QuoteRecord
 	if err := s.DB.Where("is_deleted = ?", false).First(&record, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

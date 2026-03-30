@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,6 +19,7 @@ func TestAuthMiddleware(t *testing.T) {
 	if err := os.Setenv("JWT_SECRET", "test_secret_key_for_testing"); err != nil {
 		t.Fatalf("Failed to set JWT_SECRET: %v", err)
 	}
+	jwtSecret = []byte("test_secret_key_for_testing")
 	defer func() {
 		if err := os.Unsetenv("JWT_SECRET"); err != nil {
 			t.Errorf("Failed to unset JWT_SECRET: %v", err)
@@ -76,8 +78,8 @@ func TestAuthMiddleware(t *testing.T) {
 	})
 
 	t.Run("Valid Token", func(t *testing.T) {
-		// Generate a valid token for testing
-		token, err := GenerateToken(1, "test@example.com")
+		uid := uuid.MustParse("00000000-0000-0000-0000-000000000001")
+		token, err := GenerateToken(uid, "test@example.com")
 		assert.NoError(t, err)
 
 		// Create a router to test the middleware
@@ -90,7 +92,11 @@ func TestAuthMiddleware(t *testing.T) {
 			// Verify context values
 			userID, exists := c.Get("user_id")
 			assert.True(t, exists)
-			assert.Equal(t, int64(1), userID)
+			assert.Equal(t, uid, userID)
+
+			got, ok := UserIDFromContext(c.Request.Context())
+			assert.True(t, ok)
+			assert.Equal(t, uid, got)
 
 			email, exists := c.Get("user_email")
 			assert.True(t, exists)
