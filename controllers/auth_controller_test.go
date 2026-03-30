@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -18,6 +20,21 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
+
+type failingCloseReadCloser struct {
+	*bytes.Reader
+	closeErr error
+}
+
+func (r *failingCloseReadCloser) Close() error {
+	return r.closeErr
+}
 
 func newAuthControllerTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
@@ -259,4 +276,75 @@ func TestBindLine_UnauthorizedWhenNoUserID(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 	assert.Contains(t, w.Body.String(), "未認證")
+}
+
+func TestGetLineProfile_LogsCloseErrorsAndReturnsProfile(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	t.Setenv("LINE_CHANNEL_ID", "test-channel-id")
+	t.Setenv("LINE_CHANNEL_SECRET", "test-channel-secret")
+
+	oldTransport := http.DefaultTransport
+	t.Cleanup(func() {
+		http.DefaultTransport = oldTransport
+	})
+
+	const tokenBody = `{"access_token":"access-token","id_token":"id-token"}`
+	const profileBody = `{"userId":"line-user-1","displayName":"LINE User","pictureUrl":"https://example.com/avatar.png"}`
+
+	callCount := 0
+	http.DefaultTransport = roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		callCount++
+
+		switch callCount {
+		case 1:
+			assert.Equal(t, http.MethodPost, req.Method)
+			assert.Equal(t, "https://api.line.me/oauth2/v2.1/token", req.URL.String())
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Header:     make(http.Header),
+				Body: &failingCloseReadCloser{
+					Reader:   bytes.NewReader([]byte(tokenBody)),
+					closeErr: errors.New("token-close-error"),
+				},
+			}, nil
+		case 2:
+			assert.Equal(t, http.MethodGet, req.Method)
+			assert.Equal(t, "https://api.line.me/v2/profile", req.URL.String())
+			assert.Equal(t, "Bearer access-token", req.Header.Get("Authorization"))
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Header:     make(http.Header),
+				Body: &failingCloseReadCloser{
+					Reader:   bytes.NewReader([]byte(profileBody)),
+					closeErr: errors.New("profile-close-error"),
+				},
+			}, nil
+		default:
+			t.Fatalf("unexpected outbound call count: %d", callCount)
+			return nil, nil
+		}
+	})
+
+	previousLogWriter := log.Writer()
+	var logBuffer bytes.Buffer
+	log.SetOutput(&logBuffer)
+	t.Cleanup(func() {
+		log.SetOutput(previousLogWriter)
+	})
+
+	recorder := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(recorder)
+	c.Request = httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/auth/line", http.NoBody)
+
+	profile, err := getLineProfile(c, "valid-code", "http://localhost:5173/auth/callback")
+	assert.NoError(t, err)
+	if assert.NotNil(t, profile) {
+		assert.Equal(t, "line-user-1", profile.UserID)
+		assert.Equal(t, "LINE User", profile.DisplayName)
+		assert.Equal(t, "https://example.com/avatar.png", profile.PictureURL)
+	}
+
+	assert.Equal(t, 2, callCount)
+	assert.Contains(t, logBuffer.String(), "close LINE token response body: token-close-error")
+	assert.Contains(t, logBuffer.String(), "close LINE profile response body: profile-close-error")
 }
