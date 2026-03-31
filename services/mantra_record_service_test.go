@@ -142,17 +142,11 @@ func TestMantraRecordService_GetDailyStats_FilterByDaysAndSortAscending(t *testi
 	assert.NoError(t, err)
 	assert.Len(t, stats, 2)
 
-	expectedOlderDate := time.Date(
-		inRangeOlder.Year(), inRangeOlder.Month(), inRangeOlder.Day(),
-		0, 0, 0, 0, inRangeOlder.Location(),
-	)
-	expectedNewerDate := time.Date(
-		inRangeNewer.Year(), inRangeNewer.Month(), inRangeNewer.Day(),
-		0, 0, 0, 0, inRangeNewer.Location(),
-	)
+	expectedOlderDate := inRangeOlder.Format("2006-01-02")
+	expectedNewerDate := inRangeNewer.Format("2006-01-02")
 
-	assert.Equal(t, expectedOlderDate, stats[0].StatDate)
-	assert.Equal(t, expectedNewerDate, stats[1].StatDate)
+	assert.Equal(t, expectedOlderDate, stats[0].StatDate.Format("2006-01-02"))
+	assert.Equal(t, expectedNewerDate, stats[1].StatDate.Format("2006-01-02"))
 	assert.Equal(t, 1, stats[0].Count)
 	assert.Equal(t, 1, stats[1].Count)
 	assert.Equal(t, mantra.ID, stats[0].MantraID)
