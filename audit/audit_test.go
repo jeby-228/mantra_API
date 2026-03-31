@@ -8,6 +8,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func asTimeValue(v interface{}) (time.Time, bool) {
+	switch t := v.(type) {
+	case time.Time:
+		return t, true
+	case *time.Time:
+		if t == nil {
+			return time.Time{}, false
+		}
+		return *t, true
+	default:
+		return time.Time{}, false
+	}
+}
+
 func TestNewCreateBaseAt_SetsAuditFieldsDeterministically(t *testing.T) {
 	at := time.Date(2026, 3, 30, 12, 0, 0, 0, time.UTC)
 	creatorID := uuid.MustParse("00000000-0000-0000-0000-000000000111")
@@ -32,7 +46,9 @@ func TestApplyUpdateAuditAt_AddsModifierAndTimestamp(t *testing.T) {
 	ApplyUpdateAuditAt(updates, modifierID, at)
 
 	assert.Equal(t, 5, updates["count"])
-	assert.Equal(t, at, updates["last_modification_time"])
+	lastModifiedAt, ok := asTimeValue(updates["last_modification_time"])
+	assert.True(t, ok, "last_modification_time should be time.Time or *time.Time")
+	assert.Equal(t, at, lastModifiedAt)
 	assert.Equal(t, modifierID, updates["last_modifier_id"])
 }
 
