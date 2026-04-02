@@ -2,10 +2,11 @@ package services
 
 import (
 	"errors"
-	"time"
 
+	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -23,15 +24,10 @@ func (s *ProductService) CreateProduct(
 	price float64,
 	description, image string,
 	stock int,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.Product, error) {
-	now := time.Now()
 	product := &models.Product{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:               audit.NewCreateBase(creatorId),
 		ProductName:        name,
 		ProductPrice:       price,
 		ProductDescription: description,
@@ -48,9 +44,9 @@ func (s *ProductService) CreateProduct(
 
 // UpdateProduct 更新產品資訊
 func (s *ProductService) UpdateProduct(
-	id uint,
+	id uuid.UUID,
 	updates map[string]interface{},
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.Product, error) {
 	var product models.Product
 	if err := s.DB.Where("is_deleted = ?", false).First(&product, id).Error; err != nil {
@@ -60,9 +56,7 @@ func (s *ProductService) UpdateProduct(
 		return nil, err
 	}
 
-	now := time.Now()
-	updates["last_modification_time"] = &now
-	updates["last_modifier_id"] = modifierId
+	audit.ApplyUpdateAudit(updates, modifierId)
 
 	if err := s.DB.Model(&product).Updates(updates).Error; err != nil {
 		return nil, err
@@ -77,16 +71,10 @@ func (s *ProductService) UpdateProduct(
 }
 
 // DeleteProduct 軟刪除產品
-func (s *ProductService) DeleteProduct(id, deleterId uint) error {
-	now := time.Now()
+func (s *ProductService) DeleteProduct(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.Product{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error
@@ -100,7 +88,7 @@ func (s *ProductService) DeleteProduct(id, deleterId uint) error {
 }
 
 // GetProductByID 取得單一產品
-func (s *ProductService) GetProductByID(id uint) (*models.Product, error) {
+func (s *ProductService) GetProductByID(id uuid.UUID) (*models.Product, error) {
 	var product models.Product
 	if err := s.DB.Where("is_deleted = ?", false).First(&product, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

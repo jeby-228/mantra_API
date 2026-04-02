@@ -55,8 +55,8 @@ definitions:
         example: user@example.com
         type: string
       id:
-        example: 1
-        type: integer
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
       name:
         example: 張三
         type: string

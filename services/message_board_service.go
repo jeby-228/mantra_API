@@ -2,10 +2,11 @@ package services
 
 import (
 	"errors"
-	"time"
 
+	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -20,8 +21,8 @@ func NewMessageBoardService(db *gorm.DB) *MessageBoardService {
 // CreateMessage 對名言紀錄新增留言
 func (s *MessageBoardService) CreateMessage(
 	message string,
-	quoteRecordID uint,
-	creatorId uint,
+	quoteRecordID uuid.UUID,
+	creatorId uuid.UUID,
 ) (*models.MessageBoard, error) {
 	if message == "" {
 		return nil, errors.New("留言內容不得為空")
@@ -38,13 +39,8 @@ func (s *MessageBoardService) CreateMessage(
 		return nil, err
 	}
 
-	now := time.Now()
 	msg := &models.MessageBoard{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:          audit.NewCreateBase(creatorId),
 		Message:       message,
 		QuoteRecordID: quoteRecordID,
 		IsEdited:      false,
@@ -59,9 +55,9 @@ func (s *MessageBoardService) CreateMessage(
 
 // EditMessage 編輯留言內容，並標記 IsEdited = true
 func (s *MessageBoardService) EditMessage(
-	id uint,
+	id uuid.UUID,
 	message string,
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.MessageBoard, error) {
 	if message == "" {
 		return nil, errors.New("留言內容不得為空")
@@ -75,13 +71,12 @@ func (s *MessageBoardService) EditMessage(
 		return nil, err
 	}
 
-	now := time.Now()
-	if err := s.DB.Model(&msg).Updates(map[string]interface{}{
-		"message":                message,
-		"is_edited":              true,
-		"last_modification_time": &now,
-		"last_modifier_id":       modifierId,
-	}).Error; err != nil {
+	updates := map[string]interface{}{
+		"message":   message,
+		"is_edited": true,
+	}
+	audit.ApplyUpdateAudit(updates, modifierId)
+	if err := s.DB.Model(&msg).Updates(updates).Error; err != nil {
 		return nil, err
 	}
 
@@ -93,16 +88,10 @@ func (s *MessageBoardService) EditMessage(
 }
 
 // DeleteMessage 軟刪除留言
-func (s *MessageBoardService) DeleteMessage(id, deleterId uint) error {
-	now := time.Now()
+func (s *MessageBoardService) DeleteMessage(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.MessageBoard{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error
@@ -116,7 +105,7 @@ func (s *MessageBoardService) DeleteMessage(id, deleterId uint) error {
 }
 
 // GetMessageByID 取得單一留言
-func (s *MessageBoardService) GetMessageByID(id uint) (*models.MessageBoard, error) {
+func (s *MessageBoardService) GetMessageByID(id uuid.UUID) (*models.MessageBoard, error) {
 	var msg models.MessageBoard
 	if err := s.DB.Preload("QuoteRecord").
 		Where("is_deleted = ?", false).
@@ -131,7 +120,7 @@ func (s *MessageBoardService) GetMessageByID(id uint) (*models.MessageBoard, err
 
 // GetMessagesByQuoteRecord 取得特定名言的所有留言（支援分頁）
 func (s *MessageBoardService) GetMessagesByQuoteRecord(
-	quoteRecordID uint,
+	quoteRecordID uuid.UUID,
 	limit, offset int,
 ) ([]models.MessageBoard, int64, error) {
 	var messages []models.MessageBoard

@@ -11,12 +11,17 @@ import (
 	"mantra_API/models"
 	"mantra_API/services"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // CreateMantra is the resolver for the createMantra field.
 func (r *mutationResolver) CreateMantra(ctx context.Context, input model.CreateMantraInput) (*model.Mantra, error) {
 	svc := services.NewMantraService(r.DB)
-	creatorID := getUserIDFromContext(ctx)
+	creatorID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	mantra, err := svc.CreateMantra(input.Content, ptrToString(input.Description), creatorID)
 	if err != nil {
@@ -29,7 +34,7 @@ func (r *mutationResolver) CreateMantra(ctx context.Context, input model.CreateM
 // UpdateMantra is the resolver for the updateMantra field.
 func (r *mutationResolver) UpdateMantra(ctx context.Context, id string, input model.UpdateMantraInput) (*model.Mantra, error) {
 	svc := services.NewMantraService(r.DB)
-	mantraID, err := parseUintID(id)
+	mantraID, err := parseUUIDID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +47,10 @@ func (r *mutationResolver) UpdateMantra(ctx context.Context, id string, input mo
 		updates["description"] = *input.Description
 	}
 
-	modifierID := getUserIDFromContext(ctx)
+	modifierID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	mantra, err := svc.UpdateMantra(mantraID, updates, modifierID)
 	if err != nil {
 		return nil, err
@@ -54,12 +62,15 @@ func (r *mutationResolver) UpdateMantra(ctx context.Context, id string, input mo
 // DeleteMantra is the resolver for the deleteMantra field.
 func (r *mutationResolver) DeleteMantra(ctx context.Context, id string) (bool, error) {
 	svc := services.NewMantraService(r.DB)
-	mantraID, err := parseUintID(id)
+	mantraID, err := parseUUIDID(id)
 	if err != nil {
 		return false, err
 	}
 
-	deleterID := getUserIDFromContext(ctx)
+	deleterID, err := requireUserID(ctx)
+	if err != nil {
+		return false, err
+	}
 	if err := svc.DeleteMantra(mantraID, deleterID); err != nil {
 		return false, err
 	}
@@ -70,7 +81,12 @@ func (r *mutationResolver) DeleteMantra(ctx context.Context, id string) (bool, e
 // CreateMantraRecord is the resolver for the createMantraRecord field.
 func (r *mutationResolver) CreateMantraRecord(ctx context.Context, input model.CreateMantraRecordInput) (*model.MantraRecord, error) {
 	svc := services.NewMantraRecordService(r.DB)
-	mantraID, err := parseUintID(input.MantraID)
+	mantraID, err := parseUUIDID(input.MantraID)
+	if err != nil {
+		return nil, err
+	}
+
+	creatorID, err := requireUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +96,6 @@ func (r *mutationResolver) CreateMantraRecord(ctx context.Context, input model.C
 		return nil, err
 	}
 
-	creatorID := getUserIDFromContext(ctx)
 	record, err := svc.CreateMantraRecord(mantraID, ptrToString(input.Location), saidAt, creatorID)
 	if err != nil {
 		return nil, err
@@ -92,12 +107,15 @@ func (r *mutationResolver) CreateMantraRecord(ctx context.Context, input model.C
 // DeleteMantraRecord is the resolver for the deleteMantraRecord field.
 func (r *mutationResolver) DeleteMantraRecord(ctx context.Context, id string) (bool, error) {
 	svc := services.NewMantraRecordService(r.DB)
-	recordID, err := parseUintID(id)
+	recordID, err := parseUUIDID(id)
 	if err != nil {
 		return false, err
 	}
 
-	deleterID := getUserIDFromContext(ctx)
+	deleterID, err := requireUserID(ctx)
+	if err != nil {
+		return false, err
+	}
 	if err := svc.DeleteMantraRecord(recordID, deleterID); err != nil {
 		return false, err
 	}
@@ -108,7 +126,10 @@ func (r *mutationResolver) DeleteMantraRecord(ctx context.Context, id string) (b
 // CreateQuoteRecord is the resolver for the createQuoteRecord field.
 func (r *mutationResolver) CreateQuoteRecord(ctx context.Context, input model.CreateQuoteRecordInput) (*model.QuoteRecord, error) {
 	svc := services.NewQuoteRecordService(r.DB)
-	creatorID := getUserIDFromContext(ctx)
+	creatorID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	saidAtParsed, err := parseOptionalTime(input.SaidAt)
 	if err != nil {
@@ -131,7 +152,7 @@ func (r *mutationResolver) CreateQuoteRecord(ctx context.Context, input model.Cr
 // UpdateQuoteRecord is the resolver for the updateQuoteRecord field.
 func (r *mutationResolver) UpdateQuoteRecord(ctx context.Context, id string, input model.UpdateQuoteRecordInput) (*model.QuoteRecord, error) {
 	svc := services.NewQuoteRecordService(r.DB)
-	recordID, err := parseUintID(id)
+	recordID, err := parseUUIDID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +174,10 @@ func (r *mutationResolver) UpdateQuoteRecord(ctx context.Context, id string, inp
 		}
 	}
 
-	modifierID := getUserIDFromContext(ctx)
+	modifierID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	record, err := svc.UpdateQuoteRecord(recordID, updates, modifierID)
 	if err != nil {
 		return nil, err
@@ -165,12 +189,15 @@ func (r *mutationResolver) UpdateQuoteRecord(ctx context.Context, id string, inp
 // DeleteQuoteRecord is the resolver for the deleteQuoteRecord field.
 func (r *mutationResolver) DeleteQuoteRecord(ctx context.Context, id string) (bool, error) {
 	svc := services.NewQuoteRecordService(r.DB)
-	recordID, err := parseUintID(id)
+	recordID, err := parseUUIDID(id)
 	if err != nil {
 		return false, err
 	}
 
-	deleterID := getUserIDFromContext(ctx)
+	deleterID, err := requireUserID(ctx)
+	if err != nil {
+		return false, err
+	}
 	if err := svc.DeleteQuoteRecord(recordID, deleterID); err != nil {
 		return false, err
 	}
@@ -181,12 +208,15 @@ func (r *mutationResolver) DeleteQuoteRecord(ctx context.Context, id string) (bo
 // CreateMessageBoard is the resolver for the createMessageBoard field.
 func (r *mutationResolver) CreateMessageBoard(ctx context.Context, input model.CreateMessageBoardInput) (*model.MessageBoard, error) {
 	svc := services.NewMessageBoardService(r.DB)
-	quoteRecordID, err := parseUintID(input.QuoteRecordID)
+	quoteRecordID, err := parseUUIDID(input.QuoteRecordID)
 	if err != nil {
 		return nil, err
 	}
 
-	creatorID := getUserIDFromContext(ctx)
+	creatorID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	message, err := svc.CreateMessage(input.Message, quoteRecordID, creatorID)
 	if err != nil {
 		return nil, err
@@ -198,12 +228,15 @@ func (r *mutationResolver) CreateMessageBoard(ctx context.Context, input model.C
 // EditMessageBoard is the resolver for the editMessageBoard field.
 func (r *mutationResolver) EditMessageBoard(ctx context.Context, id string, input model.EditMessageBoardInput) (*model.MessageBoard, error) {
 	svc := services.NewMessageBoardService(r.DB)
-	messageID, err := parseUintID(id)
+	messageID, err := parseUUIDID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	modifierID := getUserIDFromContext(ctx)
+	modifierID, err := requireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	message, err := svc.EditMessage(messageID, input.Message, modifierID)
 	if err != nil {
 		return nil, err
@@ -215,12 +248,15 @@ func (r *mutationResolver) EditMessageBoard(ctx context.Context, id string, inpu
 // DeleteMessageBoard is the resolver for the deleteMessageBoard field.
 func (r *mutationResolver) DeleteMessageBoard(ctx context.Context, id string) (bool, error) {
 	svc := services.NewMessageBoardService(r.DB)
-	messageID, err := parseUintID(id)
+	messageID, err := parseUUIDID(id)
 	if err != nil {
 		return false, err
 	}
 
-	deleterID := getUserIDFromContext(ctx)
+	deleterID, err := requireUserID(ctx)
+	if err != nil {
+		return false, err
+	}
 	if err := svc.DeleteMessage(messageID, deleterID); err != nil {
 		return false, err
 	}
@@ -332,7 +368,7 @@ func (r *queryResolver) Products(ctx context.Context, limit *int, offset *int) (
 // Mantra is the resolver for the mantra field.
 func (r *queryResolver) Mantra(ctx context.Context, id string) (*model.Mantra, error) {
 	svc := services.NewMantraService(r.DB)
-	mantraID, err := parseUintID(id)
+	mantraID, err := parseUUIDID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -371,7 +407,7 @@ func (r *queryResolver) Mantras(ctx context.Context, limit *int, offset *int) (*
 // MantraRecord is the resolver for the mantraRecord field.
 func (r *queryResolver) MantraRecord(ctx context.Context, id string) (*model.MantraRecord, error) {
 	svc := services.NewMantraRecordService(r.DB)
-	recordID, err := parseUintID(id)
+	recordID, err := parseUUIDID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -389,9 +425,9 @@ func (r *queryResolver) MantraRecords(ctx context.Context, mantraID *string, lim
 	svc := services.NewMantraRecordService(r.DB)
 	lim, off := normalizeLimitOffset(limit, offset)
 
-	filterMantraID := uint(0)
+	filterMantraID := uuid.Nil
 	if mantraID != nil && *mantraID != "" {
-		parsed, err := parseUintID(*mantraID)
+		parsed, err := parseUUIDID(*mantraID)
 		if err != nil {
 			return nil, err
 		}
@@ -419,7 +455,7 @@ func (r *queryResolver) MantraRecords(ctx context.Context, mantraID *string, lim
 // MantraDailyStats is the resolver for the mantraDailyStats field.
 func (r *queryResolver) MantraDailyStats(ctx context.Context, mantraID string, days int) ([]*model.MantraDailyStat, error) {
 	svc := services.NewMantraRecordService(r.DB)
-	parsedMantraID, err := parseUintID(mantraID)
+	parsedMantraID, err := parseUUIDID(mantraID)
 	if err != nil {
 		return nil, err
 	}
@@ -440,7 +476,7 @@ func (r *queryResolver) MantraDailyStats(ctx context.Context, mantraID string, d
 // QuoteRecord is the resolver for the quoteRecord field.
 func (r *queryResolver) QuoteRecord(ctx context.Context, id string) (*model.QuoteRecord, error) {
 	svc := services.NewQuoteRecordService(r.DB)
-	recordID, err := parseUintID(id)
+	recordID, err := parseUUIDID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -479,7 +515,7 @@ func (r *queryResolver) QuoteRecords(ctx context.Context, limit *int, offset *in
 // MessageBoard is the resolver for the messageBoard field.
 func (r *queryResolver) MessageBoard(ctx context.Context, id string) (*model.MessageBoard, error) {
 	svc := services.NewMessageBoardService(r.DB)
-	messageID, err := parseUintID(id)
+	messageID, err := parseUUIDID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -495,7 +531,7 @@ func (r *queryResolver) MessageBoard(ctx context.Context, id string) (*model.Mes
 // MessageBoards is the resolver for the messageBoards field.
 func (r *queryResolver) MessageBoards(ctx context.Context, quoteRecordID string, limit *int, offset *int) (*model.MessageBoardsResponse, error) {
 	svc := services.NewMessageBoardService(r.DB)
-	parsedQuoteRecordID, err := parseUintID(quoteRecordID)
+	parsedQuoteRecordID, err := parseUUIDID(quoteRecordID)
 	if err != nil {
 		return nil, err
 	}

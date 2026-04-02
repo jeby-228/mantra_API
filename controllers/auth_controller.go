@@ -9,11 +9,13 @@ import (
 	"os"
 	"strings"
 
+	"mantra_API/audit"
 	"mantra_API/auth"
 	"mantra_API/models"
 	"mantra_API/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +27,7 @@ func SetDB(database *gorm.DB) {
 }
 
 type User struct {
-	ID    int64  `json:"id"    example:"1"`
+	ID    string `json:"id"    example:"550e8400-e29b-41d4-a716-446655440000"`
 	Name  string `json:"name"  example:"張三"`
 	Email string `json:"email" example:"user@example.com"`
 }
@@ -78,8 +80,13 @@ func Register(input *gin.Context) {
 	// 使用 Service 層建立會員（自動處理密碼加密、審計欄位等）
 	svc := services.NewMemberService(db)
 
-	// 註冊時使用 creatorId = 0 表示自行註冊
-	member, err := svc.CreateMember(req.Name, req.Email, req.Password, 0)
+	// 自行註冊無既有會員可當建立者，使用固定系統 UUID 以利稽核（見 audit.SelfRegistrationCreatorID）
+	member, err := svc.CreateMember(
+		req.Name,
+		req.Email,
+		req.Password,
+		audit.SelfRegistrationCreatorID,
+	)
 	if err != nil {
 		if err.Error() == "email 已被使用" {
 			input.JSON(http.StatusConflict, gin.H{"error": "該電子郵件已被註冊"})
@@ -89,11 +96,10 @@ func Register(input *gin.Context) {
 		return
 	}
 
-	// #nosec G115 - member.ID 來自資料庫，不會溢位
-	user := User{ID: int64(member.ID), Name: member.Name, Email: member.Email}
+	user := User{ID: member.ID.String(), Name: member.Name, Email: member.Email}
 
 	// 生成 token
-	token, err := auth.GenerateToken(user.ID, user.Email)
+	token, err := auth.GenerateToken(member.ID, member.Email)
 	if err != nil {
 		input.JSON(http.StatusInternalServerError, gin.H{"error": "Token 生成失敗"})
 		return
@@ -149,11 +155,9 @@ func Login(input *gin.Context) {
 		return
 	}
 
-	// #nosec G115 - member.ID 來自資料庫，不會溢位
-	user := User{ID: int64(member.ID), Name: member.Name, Email: member.Email}
+	user := User{ID: member.ID.String(), Name: member.Name, Email: member.Email}
 
-	// 生成 token
-	token, err := auth.GenerateToken(user.ID, user.Email)
+	token, err := auth.GenerateToken(member.ID, member.Email)
 	if err != nil {
 		input.JSON(http.StatusInternalServerError, gin.H{"error": "Token 生成失敗"})
 		return
@@ -221,9 +225,8 @@ func LineLogin(c *gin.Context) {
 	}
 
 	// 4. Generate App Token
-	// #nosec G115 - member.ID 來自資料庫，不會溢位
-	user := User{ID: int64(member.ID), Name: member.Name, Email: member.Email}
-	token, err := auth.GenerateToken(user.ID, user.Email)
+	user := User{ID: member.ID.String(), Name: member.Name, Email: member.Email}
+	token, err := auth.GenerateToken(member.ID, member.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token 生成失敗"})
 		return
@@ -344,7 +347,7 @@ func BindLine(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
 		return
 	}
-	idValue, ok := userID.(int64)
+	idValue, ok := userID.(uuid.UUID)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
 		return
@@ -379,8 +382,7 @@ func BindLine(c *gin.Context) {
 
 	if err == nil {
 		// 如果找到記錄，且不是當前用戶，則報錯
-		// #nosec G115 - ID 來自資料庫，不會溢位
-		if int64(existingMember.ID) != idValue {
+		if existingMember.ID != idValue {
 			c.JSON(http.StatusConflict, gin.H{"error": "該 LINE 帳號已被其他會員綁定"})
 			return
 		}
@@ -403,9 +405,8 @@ func BindLine(c *gin.Context) {
 		return
 	}
 
-	// #nosec G115 - member.ID 來自資料庫，不會溢位
 	c.JSON(http.StatusOK, gin.H{
-		"user": User{ID: int64(member.ID), Name: member.Name, Email: member.Email},
+		"user": User{ID: member.ID.String(), Name: member.Name, Email: member.Email},
 	})
 }
 
@@ -426,7 +427,7 @@ func UnbindLine(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
 		return
 	}
-	idValue, ok := userID.(int64)
+	idValue, ok := userID.(uuid.UUID)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
 		return
@@ -454,8 +455,7 @@ func UnbindLine(c *gin.Context) {
 
 	member.LineID = ""
 
-	// #nosec G115 - member.ID 來自資料庫，不會溢位
 	c.JSON(http.StatusOK, gin.H{
-		"user": User{ID: int64(member.ID), Name: member.Name, Email: member.Email},
+		"user": User{ID: member.ID.String(), Name: member.Name, Email: member.Email},
 	})
 }
