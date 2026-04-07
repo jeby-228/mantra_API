@@ -1,6 +1,7 @@
 # 會員 API 專案的 Justfile
 default:
-    @just --list
+    just --fmt --unstable 2> /dev/null
+    just --list --unsorted
 
 # 初始化開發環境
 setup:
@@ -58,7 +59,6 @@ test-cov:
     else \
         echo "沒有可用的覆蓋率資料"; \
     fi
-
 
 # 生成 GraphQL
 graphql:
