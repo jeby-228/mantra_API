@@ -2,12 +2,15 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
+	"mantra_API/auth"
 	"mantra_API/graphql/model"
 	"mantra_API/models"
+
+	"github.com/google/uuid"
 )
 
 // dbToModel converts DB Member to GraphQL model
@@ -22,7 +25,7 @@ func dbToModel(m models.Member) *model.Member {
 		updated = &s
 	}
 	return &model.Member{
-		ID:        formatID(m.ID),
+		ID:        m.ID.String(),
 		Name:      m.Name,
 		Email:     m.Email,
 		CreatedAt: created,
@@ -42,7 +45,7 @@ func productDBToModel(p models.Product) *model.Product {
 		updated = &s
 	}
 	return &model.Product{
-		ID:                 formatID(p.ID),
+		ID:                 p.ID.String(),
 		ProductName:        p.ProductName,
 		ProductPrice:       p.ProductPrice,
 		ProductDescription: stringPtr(p.ProductDescription),
@@ -65,7 +68,7 @@ func mantraDBToModel(m models.Mantra) *model.Mantra {
 	}
 
 	return &model.Mantra{
-		ID:          formatID(m.ID),
+		ID:          m.ID.String(),
 		Content:     m.Content,
 		Description: stringPtr(m.Description),
 		CreatedAt:   created,
@@ -89,8 +92,8 @@ func mantraRecordDBToModel(r models.MantraRecord) *model.MantraRecord {
 	}
 
 	return &model.MantraRecord{
-		ID:        formatID(r.ID),
-		MantraID:  formatID(r.MantraID),
+		ID:        r.ID.String(),
+		MantraID:  r.MantraID.String(),
 		Location:  stringPtr(r.Location),
 		SaidAt:    saidAt,
 		CreatedAt: created,
@@ -100,7 +103,7 @@ func mantraRecordDBToModel(r models.MantraRecord) *model.MantraRecord {
 
 func mantraDailyStatDBToModel(s models.MantraDailyStat) *model.MantraDailyStat {
 	return &model.MantraDailyStat{
-		MantraID: formatID(s.MantraID),
+		MantraID: s.MantraID.String(),
 		StatDate: s.StatDate.Format("2006-01-02"),
 		Count:    s.Count,
 	}
@@ -122,7 +125,7 @@ func quoteRecordDBToModel(q models.QuoteRecord) *model.QuoteRecord {
 	}
 
 	return &model.QuoteRecord{
-		ID:        formatID(q.ID),
+		ID:        q.ID.String(),
 		JbName:    q.JBName,
 		Quote:     q.Quote,
 		SaidAt:    saidAt,
@@ -143,9 +146,9 @@ func messageBoardDBToModel(m models.MessageBoard) *model.MessageBoard {
 	}
 
 	return &model.MessageBoard{
-		ID:            formatID(m.ID),
+		ID:            m.ID.String(),
 		Message:       m.Message,
-		QuoteRecordID: formatID(m.QuoteRecordID),
+		QuoteRecordID: m.QuoteRecordID.String(),
 		IsEdited:      m.IsEdited,
 		CreatedAt:     created,
 		UpdatedAt:     updated,
@@ -157,18 +160,16 @@ func formatTime(t time.Time) string {
 	return t.UTC().Format(time.RFC3339)
 }
 
-// formatID converts uint ID to string
-func formatID(id uint) string {
-	return strconv.FormatUint(uint64(id), 10)
-}
+// ErrUnauthorized 表示未登入、JWT 無效或 context 未注入使用者 ID。
+var ErrUnauthorized = errors.New("未登入或無效的認證憑證")
 
-// getUserIDFromContext extracts user ID from context
-func getUserIDFromContext(ctx context.Context) uint {
-	userID, ok := ctx.Value("user_id").(int64)
-	if !ok || userID <= 0 {
-		return 0
+// requireUserID 從 JWT 注入的 context 取得會員 GUID；未認證則回傳錯誤（禁止以 uuid.Nil 當建立者）。
+func requireUserID(ctx context.Context) (uuid.UUID, error) {
+	userID, ok := auth.UserIDFromContext(ctx)
+	if !ok {
+		return uuid.Nil, ErrUnauthorized
 	}
-	return uint(userID)
+	return userID, nil
 }
 
 // stringPtr converts string to *string pointer
@@ -187,12 +188,12 @@ func ptrToString(s *string) string {
 	return *s
 }
 
-func parseUintID(id string) (uint, error) {
-	parsed, err := strconv.ParseUint(id, 10, 32)
+func parseUUIDID(id string) (uuid.UUID, error) {
+	u, err := uuid.Parse(id)
 	if err != nil {
-		return 0, fmt.Errorf("無效的 ID")
+		return uuid.Nil, fmt.Errorf("無效的 ID %q，需為 UUID 格式: %w", id, err)
 	}
-	return uint(parsed), nil
+	return u, nil
 }
 
 func parseOptionalTime(input *string) (*time.Time, error) {

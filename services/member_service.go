@@ -4,9 +4,11 @@ import (
 	"errors"
 	"time"
 
+	"mantra_API/audit"
 	"mantra_API/auth"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +23,7 @@ func NewMemberService(db *gorm.DB) *MemberService {
 // CreateMember 建立新會員
 func (s *MemberService) CreateMember(
 	name, email, password string,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.Member, error) {
 	// 檢查 email 是否已存在
 	var exists models.Member
@@ -37,13 +39,8 @@ func (s *MemberService) CreateMember(
 		return nil, err
 	}
 
-	now := time.Now()
 	member := &models.Member{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:         audit.NewCreateBase(creatorId),
 		Name:         name,
 		Email:        email,
 		PasswordHash: hash,
@@ -58,9 +55,9 @@ func (s *MemberService) CreateMember(
 
 // UpdateMember 更新會員資訊
 func (s *MemberService) UpdateMember(
-	id uint,
+	id uuid.UUID,
 	name, email string,
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.Member, error) {
 	var member models.Member
 	if err := s.DB.Where("is_deleted = ?", false).First(&member, id).Error; err != nil {
@@ -84,16 +81,10 @@ func (s *MemberService) UpdateMember(
 }
 
 // DeleteMember 軟刪除會員
-func (s *MemberService) DeleteMember(id, deleterId uint) error {
-	now := time.Now()
+func (s *MemberService) DeleteMember(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.Member{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error
@@ -107,7 +98,7 @@ func (s *MemberService) DeleteMember(id, deleterId uint) error {
 }
 
 // GetMemberByID 取得單一會員
-func (s *MemberService) GetMemberByID(id uint) (*models.Member, error) {
+func (s *MemberService) GetMemberByID(id uuid.UUID) (*models.Member, error) {
 	var member models.Member
 	if err := s.DB.Where("is_deleted = ?", false).First(&member, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

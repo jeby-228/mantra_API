@@ -1,10 +1,12 @@
 package auth
 
 import (
+	"errors"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 var jwtSecret []byte
@@ -17,19 +19,19 @@ func init() {
 	jwtSecret = []byte(secret)
 }
 
-// Claims 定義 JWT 的 claims
+// Claims 定義 JWT 的 claims（user_id 為會員 GUID 字串）
 type Claims struct {
-	UserID int64  `json:"user_id"`
+	UserID string `json:"user_id"`
 	Email  string `json:"email"`
 	jwt.RegisteredClaims
 }
 
 // GenerateToken 生成 JWT token
-func GenerateToken(userID int64, email string) (string, error) {
+func GenerateToken(userID uuid.UUID, email string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour) // 24小時過期
 
 	claims := &Claims{
-		UserID: userID,
+		UserID: userID.String(),
 		Email:  email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
@@ -68,6 +70,10 @@ func ValidateToken(tokenString string) (*Claims, error) {
 
 	if token == nil || !token.Valid {
 		return nil, jwt.ErrTokenInvalidClaims
+	}
+
+	if _, err := uuid.Parse(claims.UserID); err != nil {
+		return nil, errors.New("無效的 user_id")
 	}
 
 	return claims, nil

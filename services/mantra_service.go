@@ -2,10 +2,11 @@ package services
 
 import (
 	"errors"
-	"time"
 
+	"mantra_API/audit"
 	"mantra_API/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -20,19 +21,14 @@ func NewMantraService(db *gorm.DB) *MantraService {
 // CreateMantra 建立新口頭禪
 func (s *MantraService) CreateMantra(
 	content, description string,
-	creatorId uint,
+	creatorId uuid.UUID,
 ) (*models.Mantra, error) {
 	if content == "" {
 		return nil, errors.New("口頭禪內容不得為空")
 	}
 
-	now := time.Now()
 	mantra := &models.Mantra{
-		Base: models.Base{
-			CreationTime: now,
-			CreatorId:    creatorId,
-			IsDeleted:    false,
-		},
+		Base:        audit.NewCreateBase(creatorId),
 		Content:     content,
 		Description: description,
 	}
@@ -46,9 +42,9 @@ func (s *MantraService) CreateMantra(
 
 // UpdateMantra 更新口頭禪資訊
 func (s *MantraService) UpdateMantra(
-	id uint,
+	id uuid.UUID,
 	updates map[string]interface{},
-	modifierId uint,
+	modifierId uuid.UUID,
 ) (*models.Mantra, error) {
 	var mantra models.Mantra
 	if err := s.DB.Where("is_deleted = ?", false).First(&mantra, id).Error; err != nil {
@@ -58,9 +54,7 @@ func (s *MantraService) UpdateMantra(
 		return nil, err
 	}
 
-	now := time.Now()
-	updates["last_modification_time"] = &now
-	updates["last_modifier_id"] = modifierId
+	audit.ApplyUpdateAudit(updates, modifierId)
 
 	if err := s.DB.Model(&mantra).Updates(updates).Error; err != nil {
 		return nil, err
@@ -74,16 +68,10 @@ func (s *MantraService) UpdateMantra(
 }
 
 // DeleteMantra 軟刪除口頭禪
-func (s *MantraService) DeleteMantra(id, deleterId uint) error {
-	now := time.Now()
+func (s *MantraService) DeleteMantra(id, deleterId uuid.UUID) error {
 	result := s.DB.Model(&models.Mantra{}).
 		Where("id = ? AND is_deleted = ?", id, false).
-		Updates(map[string]interface{}{
-			"is_deleted":             true,
-			"deleted_at":             &now,
-			"last_modifier_id":       deleterId,
-			"last_modification_time": &now,
-		})
+		Updates(audit.SoftDeleteFields(deleterId))
 
 	if result.Error != nil {
 		return result.Error
@@ -97,7 +85,7 @@ func (s *MantraService) DeleteMantra(id, deleterId uint) error {
 }
 
 // GetMantraByID 取得單一口頭禪
-func (s *MantraService) GetMantraByID(id uint) (*models.Mantra, error) {
+func (s *MantraService) GetMantraByID(id uuid.UUID) (*models.Mantra, error) {
 	var mantra models.Mantra
 	if err := s.DB.Where("is_deleted = ?", false).First(&mantra, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

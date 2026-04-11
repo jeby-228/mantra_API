@@ -21,7 +21,7 @@ func SetupRouter(router *gin.Engine) {
 		public.POST("/auth/line", controllers.LineLogin)
 	}
 
-	// GraphQL endpoint
+	// GraphQL：GET 為 Playground（無需 JWT），其餘（POST 等）需 JWT
 	router.Any("/graphql", func(c *gin.Context) {
 		graphqlHandler := graphql.GetHandler()
 		if graphqlHandler == nil {
@@ -30,6 +30,13 @@ func SetupRouter(router *gin.Engine) {
 				gin.H{"error": "GraphQL handler not initialized"},
 			)
 			return
+		}
+		// OPTIONS 為 CORS 預檢，不可要求 JWT
+		if c.Request.Method != http.MethodGet && c.Request.Method != http.MethodOptions {
+			auth.AuthMiddleware()(c)
+			if c.IsAborted() {
+				return
+			}
 		}
 		graphqlHandler.ServeHTTP(c.Writer, c.Request)
 	})

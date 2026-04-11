@@ -10,9 +10,9 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o mantra_api ./main.go
 
-FROM alpine:3.21
+FROM alpine:3.23
 RUN apk --no-cache add ca-certificates wget && \
-    apk --no-cache upgrade libssl3 libcrypto3 && \
+    apk --no-cache upgrade && \
     update-ca-certificates
 WORKDIR /app
 

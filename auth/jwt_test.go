@@ -7,6 +7,18 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+)
+
+// 固定測試用 UUID（數值尾綴僅供辨識，仍為合法 GUID）
+var (
+	testUID1   = uuid.MustParse("00000000-0000-0000-0000-000000000001")
+	testUID2   = uuid.MustParse("00000000-0000-0000-0000-000000000002")
+	testUID42  = uuid.MustParse("00000000-0000-0000-0000-00000000002a")
+	testUID100 = uuid.MustParse("00000000-0000-0000-0000-000000000064")
+	testUID123 = uuid.MustParse("00000000-0000-0000-0000-00000000007b")
+	testUID999 = uuid.MustParse("00000000-0000-0000-0000-0000000003e7")
+	testUIDBig = uuid.MustParse("ffffffff-ffff-4fff-bfff-ffffffffffff")
 )
 
 // setupTest 統一的測試環境設置
@@ -19,9 +31,9 @@ func setupTest(t *testing.T) {
 }
 
 // createTestClaims 創建測試用的 claims
-func createTestClaims(userID int64, email string, expiresAt, issuedAt time.Time) *Claims {
+func createTestClaims(userID uuid.UUID, email string, expiresAt, issuedAt time.Time) *Claims {
 	return &Claims{
-		UserID: userID,
+		UserID: userID.String(),
 		Email:  email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
@@ -36,14 +48,14 @@ func TestGenerateToken(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		userID    int64
+		userID    uuid.UUID
 		email     string
 		wantErr   bool
 		validator func(t *testing.T, token string)
 	}{
 		{
 			name:    "成功生成標準 token",
-			userID:  1,
+			userID:  testUID1,
 			email:   "user@example.com",
 			wantErr: false,
 			validator: func(t *testing.T, token string) {
@@ -57,8 +69,8 @@ func TestGenerateToken(t *testing.T) {
 				if err != nil {
 					t.Errorf("生成的 token 無法驗證: %v", err)
 				}
-				if claims.UserID != 1 {
-					t.Errorf("UserID = %v, want 1", claims.UserID)
+				if claims.UserID != testUID1.String() {
+					t.Errorf("UserID = %v, want %v", claims.UserID, testUID1)
 				}
 				if claims.Email != "user@example.com" {
 					t.Errorf("Email = %v, want user@example.com", claims.Email)
@@ -66,8 +78,8 @@ func TestGenerateToken(t *testing.T) {
 			},
 		},
 		{
-			name:    "生成大 UserID 的 token",
-			userID:  9223372036854775807, // int64 最大值
+			name:    "生成大 UUID 的 token",
+			userID:  testUIDBig,
 			email:   "max@example.com",
 			wantErr: false,
 			validator: func(t *testing.T, token string) {
@@ -78,7 +90,7 @@ func TestGenerateToken(t *testing.T) {
 		},
 		{
 			name:    "生成含特殊字符 email 的 token",
-			userID:  999,
+			userID:  testUID999,
 			email:   "user+test@sub.example.com",
 			wantErr: false,
 			validator: func(t *testing.T, token string) {
@@ -90,7 +102,7 @@ func TestGenerateToken(t *testing.T) {
 		},
 		{
 			name:    "生成空 email 的 token（技術上可行）",
-			userID:  1,
+			userID:  testUID1,
 			email:   "",
 			wantErr: false,
 			validator: func(t *testing.T, token string) {
@@ -125,7 +137,7 @@ func TestGenerateToken(t *testing.T) {
 func TestGenerateTokenExpiration(t *testing.T) {
 	setupTest(t)
 
-	token, err := GenerateToken(1, "test@example.com")
+	token, err := GenerateToken(testUID1, "test@example.com")
 	if err != nil {
 		t.Fatalf("GenerateToken() failed: %v", err)
 	}
@@ -163,7 +175,7 @@ func TestValidateToken(t *testing.T) {
 	setupTest(t)
 
 	// 準備有效的 token
-	validToken, err := GenerateToken(123, "valid@example.com")
+	validToken, err := GenerateToken(testUID123, "valid@example.com")
 	if err != nil {
 		t.Fatalf("Failed to generate valid token: %v", err)
 	}
@@ -172,7 +184,7 @@ func TestValidateToken(t *testing.T) {
 		name           string
 		token          string
 		wantErr        bool
-		wantUserID     int64
+		wantUserID     string
 		wantEmail      string
 		validateClaims bool
 	}{
@@ -180,7 +192,7 @@ func TestValidateToken(t *testing.T) {
 			name:           "驗證有效 token",
 			token:          validToken,
 			wantErr:        false,
-			wantUserID:     123,
+			wantUserID:     testUID123.String(),
 			wantEmail:      "valid@example.com",
 			validateClaims: true,
 		},
@@ -291,7 +303,7 @@ func TestValidateTokenExpired(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			claims := createTestClaims(
-				1,
+				testUID1,
 				"test@example.com",
 				tt.expiryTime,
 				time.Now().Add(-1*time.Hour),
@@ -331,7 +343,7 @@ func TestValidateTokenSignature(t *testing.T) {
 			name: "使用錯誤的 secret 簽名",
 			setupToken: func() string {
 				claims := createTestClaims(
-					1,
+					testUID1,
 					"test@example.com",
 					time.Now().Add(24*time.Hour),
 					time.Now(),
@@ -346,7 +358,7 @@ func TestValidateTokenSignature(t *testing.T) {
 		{
 			name: "篡改 payload",
 			setupToken: func() string {
-				validToken, _ := GenerateToken(1, "test@example.com")
+				validToken, _ := GenerateToken(testUID1, "test@example.com")
 				// 修改 token 的中間部分
 				parts := strings.Split(validToken, ".")
 				if len(parts) == 3 {
@@ -362,7 +374,7 @@ func TestValidateTokenSignature(t *testing.T) {
 		{
 			name: "篡改 signature",
 			setupToken: func() string {
-				validToken, _ := GenerateToken(1, "test@example.com")
+				validToken, _ := GenerateToken(testUID1, "test@example.com")
 				parts := strings.Split(validToken, ".")
 				if len(parts) == 3 {
 					// 完全替換簽名為不同的值，確保篡改有效
@@ -384,7 +396,7 @@ func TestValidateTokenSignature(t *testing.T) {
 		{
 			name: "使用正確的 secret",
 			setupToken: func() string {
-				token, _ := GenerateToken(100, "correct@example.com")
+				token, _ := GenerateToken(testUID100, "correct@example.com")
 				return token
 			},
 			wantErr:     false,
@@ -420,7 +432,12 @@ func TestValidateTokenValid(t *testing.T) {
 		// 這個測試專門驗證 jwt.go 中的 if !token.Valid 條件分支
 
 		// Case 1: 使用錯誤 secret - 應觸發 token.Valid = false
-		claims := createTestClaims(1, "test@example.com", time.Now().Add(24*time.Hour), time.Now())
+		claims := createTestClaims(
+			testUID1,
+			"test@example.com",
+			time.Now().Add(24*time.Hour),
+			time.Now(),
+		)
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 		wrongSecretToken, _ := token.SignedString([]byte("wrong-secret"))
 
@@ -434,7 +451,7 @@ func TestValidateTokenValid(t *testing.T) {
 
 		// Case 2: 過期的 token - 應觸發 err != nil 且 token.Valid = false
 		expiredClaims := createTestClaims(
-			2,
+			testUID2,
 			"expired@example.com",
 			time.Now().Add(-1*time.Hour),
 			time.Now().Add(-2*time.Hour),
@@ -460,22 +477,22 @@ func TestTokenRoundTrip(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		userID int64
+		userID uuid.UUID
 		email  string
 	}{
 		{
 			name:   "標準用戶",
-			userID: 42,
+			userID: testUID42,
 			email:  "roundtrip@example.com",
 		},
 		{
 			name:   "管理員",
-			userID: 1,
+			userID: testUID1,
 			email:  "admin@example.com",
 		},
 		{
-			name:   "大 ID 用戶",
-			userID: 9999999999,
+			name:   "大 UUID 用戶",
+			userID: testUIDBig,
 			email:  "bigid@example.com",
 		},
 	}
@@ -495,8 +512,8 @@ func TestTokenRoundTrip(t *testing.T) {
 			}
 
 			// 驗證 claims 內容
-			if claims.UserID != tt.userID {
-				t.Errorf("UserID = %v, want %v", claims.UserID, tt.userID)
+			if claims.UserID != tt.userID.String() {
+				t.Errorf("UserID = %v, want %v", claims.UserID, tt.userID.String())
 			}
 			if claims.Email != tt.email {
 				t.Errorf("Email = %v, want %v", claims.Email, tt.email)
@@ -557,7 +574,7 @@ func TestValidateTokenAlgorithmSubstitution(t *testing.T) {
 			setupToken: func() string {
 				// 創建一個使用 "none" 算法的 token
 				claims := createTestClaims(
-					1,
+					testUID1,
 					"attacker@example.com",
 					time.Now().Add(24*time.Hour),
 					time.Now(),
@@ -574,7 +591,7 @@ func TestValidateTokenAlgorithmSubstitution(t *testing.T) {
 			setupToken: func() string {
 				// 使用 HS384 而不是 HS256
 				claims := createTestClaims(
-					1,
+					testUID1,
 					"attacker@example.com",
 					time.Now().Add(24*time.Hour),
 					time.Now(),
@@ -591,7 +608,7 @@ func TestValidateTokenAlgorithmSubstitution(t *testing.T) {
 			setupToken: func() string {
 				// 使用 HS512 而不是 HS256
 				claims := createTestClaims(
-					1,
+					testUID1,
 					"attacker@example.com",
 					time.Now().Add(24*time.Hour),
 					time.Now(),
@@ -622,7 +639,7 @@ func TestValidateTokenAlgorithmSubstitution(t *testing.T) {
 		{
 			name: "正常的 HS256 token 應該通過",
 			setupToken: func() string {
-				token, _ := GenerateToken(1, "valid@example.com")
+				token, _ := GenerateToken(testUID1, "valid@example.com")
 				return token
 			},
 			wantErr:     false,
