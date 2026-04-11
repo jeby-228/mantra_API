@@ -2,6 +2,8 @@ module mantra_API
 
 go 1.26
 
+toolchain go1.26.2
+
 require (
 	github.com/99designs/gqlgen v0.17.85
 	github.com/gin-contrib/cors v1.7.7
