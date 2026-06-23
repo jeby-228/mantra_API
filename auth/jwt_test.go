@@ -21,6 +21,8 @@ var (
 	testUIDBig = uuid.MustParse("ffffffff-ffff-4fff-bfff-ffffffffffff")
 )
 
+const jwtExpiredErrSubstring = "expired"
+
 // setupTest 統一的測試環境設置
 func setupTest(t *testing.T) {
 	t.Helper()
@@ -38,7 +40,7 @@ func createTestClaims(userID uuid.UUID, email string, expiresAt, issuedAt time.T
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(issuedAt),
-			Issuer:    "member-api",
+			Issuer:    JWTIssuer,
 		},
 	}
 }
@@ -158,8 +160,8 @@ func TestGenerateTokenExpiration(t *testing.T) {
 	}
 
 	// 驗證 Issuer
-	if claims.Issuer != "member-api" {
-		t.Errorf("Issuer = %v, want member-api", claims.Issuer)
+	if claims.Issuer != JWTIssuer {
+		t.Errorf("Issuer = %v, want %s", claims.Issuer, JWTIssuer)
 	}
 
 	// 驗證 IssuedAt
@@ -274,19 +276,19 @@ func TestValidateTokenExpired(t *testing.T) {
 			name:       "過期 1 小時",
 			expiryTime: time.Now().Add(-1 * time.Hour),
 			wantErr:    true,
-			errMsg:     "expired",
+			errMsg:     jwtExpiredErrSubstring,
 		},
 		{
 			name:       "過期 1 秒",
 			expiryTime: time.Now().Add(-1 * time.Second),
 			wantErr:    true,
-			errMsg:     "expired",
+			errMsg:     jwtExpiredErrSubstring,
 		},
 		{
 			name:       "過期 1 天",
 			expiryTime: time.Now().Add(-24 * time.Hour),
 			wantErr:    true,
-			errMsg:     "expired",
+			errMsg:     jwtExpiredErrSubstring,
 		},
 		{
 			name:       "還沒過期（未來 1 小時）",
@@ -466,8 +468,8 @@ func TestValidateTokenValid(t *testing.T) {
 		if result != nil {
 			t.Error("驗證失敗時應返回 nil claims")
 		}
-		if !strings.Contains(err.Error(), "expired") {
-			t.Errorf("錯誤訊息應該包含 'expired'，實際: %v", err)
+		if !strings.Contains(err.Error(), jwtExpiredErrSubstring) {
+			t.Errorf("錯誤訊息應該包含 '%s'，實際: %v", jwtExpiredErrSubstring, err)
 		}
 	})
 }
@@ -518,8 +520,8 @@ func TestTokenRoundTrip(t *testing.T) {
 			if claims.Email != tt.email {
 				t.Errorf("Email = %v, want %v", claims.Email, tt.email)
 			}
-			if claims.Issuer != "member-api" {
-				t.Errorf("Issuer = %v, want member-api", claims.Issuer)
+			if claims.Issuer != JWTIssuer {
+				t.Errorf("Issuer = %v, want %s", claims.Issuer, JWTIssuer)
 			}
 
 			// 驗證時間相關的 claims

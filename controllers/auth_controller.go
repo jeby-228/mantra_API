@@ -67,13 +67,13 @@ type AuthResponse struct {
 // @Router /register [post]
 func Register(input *gin.Context) {
 	if db == nil {
-		input.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
+		input.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: errDBNotConfigured})
 		return
 	}
 
 	var req RegisterRequest
 	if err := input.ShouldBindJSON(&req); err != nil {
-		input.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		input.JSON(http.StatusBadRequest, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
@@ -89,10 +89,10 @@ func Register(input *gin.Context) {
 	)
 	if err != nil {
 		if err.Error() == "email 已被使用" {
-			input.JSON(http.StatusConflict, gin.H{"error": "該電子郵件已被註冊"})
+			input.JSON(http.StatusConflict, gin.H{auth.ErrorKey: "該電子郵件已被註冊"})
 			return
 		}
-		input.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		input.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
@@ -101,7 +101,7 @@ func Register(input *gin.Context) {
 	// 生成 token
 	token, err := auth.GenerateToken(member.ID, member.Email)
 	if err != nil {
-		input.JSON(http.StatusInternalServerError, gin.H{"error": "Token 生成失敗"})
+		input.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: errTokenGenerateFailed})
 		return
 	}
 
@@ -125,13 +125,13 @@ func Register(input *gin.Context) {
 // @Router /login [post]
 func Login(input *gin.Context) {
 	if db == nil {
-		input.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
+		input.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: errDBNotConfigured})
 		return
 	}
 
 	var req LoginRequest
 	if err := input.ShouldBindJSON(&req); err != nil {
-		input.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		input.JSON(http.StatusBadRequest, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
@@ -142,16 +142,16 @@ func Login(input *gin.Context) {
 		First(&member).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			input.JSON(http.StatusUnauthorized, gin.H{"error": "電子郵件或密碼錯誤"})
+			input.JSON(http.StatusUnauthorized, gin.H{auth.ErrorKey: "電子郵件或密碼錯誤"})
 			return
 		}
-		input.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		input.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
 	// 驗證密碼
 	if !auth.CheckPassword(req.Password, member.PasswordHash) {
-		input.JSON(http.StatusUnauthorized, gin.H{"error": "電子郵件或密碼錯誤"})
+		input.JSON(http.StatusUnauthorized, gin.H{auth.ErrorKey: "電子郵件或密碼錯誤"})
 		return
 	}
 
@@ -159,7 +159,7 @@ func Login(input *gin.Context) {
 
 	token, err := auth.GenerateToken(member.ID, member.Email)
 	if err != nil {
-		input.JSON(http.StatusInternalServerError, gin.H{"error": "Token 生成失敗"})
+		input.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: errTokenGenerateFailed})
 		return
 	}
 
@@ -183,13 +183,13 @@ func Login(input *gin.Context) {
 // @Router /auth/line [post]
 func LineLogin(c *gin.Context) {
 	if db == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
+		c.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: errDBNotConfigured})
 		return
 	}
 
 	var req LineLoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
@@ -200,7 +200,7 @@ func LineLogin(c *gin.Context) {
 		if err.Error() == "無效的 LINE 授權碼" || err.Error() == "LINE 配置未設定" {
 			status = http.StatusUnauthorized
 		}
-		c.JSON(status, gin.H{"error": err.Error()})
+		c.JSON(status, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
@@ -219,7 +219,7 @@ func LineLogin(c *gin.Context) {
 			LineID: lineProfile.UserID,
 		}
 		if err := db.WithContext(c.Request.Context()).Create(&member).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "無法創建用戶"})
+			c.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: "無法創建用戶"})
 			return
 		}
 	}
@@ -228,7 +228,7 @@ func LineLogin(c *gin.Context) {
 	user := User{ID: member.ID.String(), Name: member.Name, Email: member.Email}
 	token, err := auth.GenerateToken(member.ID, member.Email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token 生成失敗"})
+		c.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: errTokenGenerateFailed})
 		return
 	}
 
@@ -344,23 +344,23 @@ func getLineProfile(c *gin.Context, code, redirectURI string) (*LineProfile, err
 func BindLine(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
+		c.JSON(http.StatusUnauthorized, gin.H{auth.ErrorKey: errNotAuthenticated})
 		return
 	}
 	idValue, ok := userID.(uuid.UUID)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
+		c.JSON(http.StatusUnauthorized, gin.H{auth.ErrorKey: errNotAuthenticated})
 		return
 	}
 
 	if db == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
+		c.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: errDBNotConfigured})
 		return
 	}
 
 	var req LineLoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
@@ -370,7 +370,7 @@ func BindLine(c *gin.Context) {
 		if err.Error() == "無效的 LINE 授權碼" {
 			status = http.StatusUnauthorized
 		}
-		c.JSON(status, gin.H{"error": err.Error()})
+		c.JSON(status, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
@@ -383,25 +383,25 @@ func BindLine(c *gin.Context) {
 	if err == nil {
 		// 如果找到記錄，且不是當前用戶，則報錯
 		if existingMember.ID != idValue {
-			c.JSON(http.StatusConflict, gin.H{"error": "該 LINE 帳號已被其他會員綁定"})
+			c.JSON(http.StatusConflict, gin.H{auth.ErrorKey: "該 LINE 帳號已被其他會員綁定"})
 			return
 		}
 		// 如果是當前用戶，視為成功（idempotent）
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: err.Error()})
 		return
 	}
 
 	// 綁定 LINE ID 到當前用戶
 	var member models.Member
 	if err := db.WithContext(c.Request.Context()).First(&member, idValue).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "用戶不存在"})
+		c.JSON(http.StatusNotFound, gin.H{auth.ErrorKey: "用戶不存在"})
 		return
 	}
 
 	member.LineID = lineProfile.UserID
 	if err := db.WithContext(c.Request.Context()).Save(&member).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法更新用戶資料"})
+		c.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: "無法更新用戶資料"})
 		return
 	}
 
@@ -424,23 +424,23 @@ func BindLine(c *gin.Context) {
 func UnbindLine(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
+		c.JSON(http.StatusUnauthorized, gin.H{auth.ErrorKey: errNotAuthenticated})
 		return
 	}
 	idValue, ok := userID.(uuid.UUID)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "未認證"})
+		c.JSON(http.StatusUnauthorized, gin.H{auth.ErrorKey: errNotAuthenticated})
 		return
 	}
 
 	if db == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "數據庫連接未配置"})
+		c.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: errDBNotConfigured})
 		return
 	}
 
 	var member models.Member
 	if err := db.WithContext(c.Request.Context()).First(&member, idValue).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "用戶不存在"})
+		c.JSON(http.StatusNotFound, gin.H{auth.ErrorKey: "用戶不存在"})
 		return
 	}
 
@@ -449,7 +449,7 @@ func UnbindLine(c *gin.Context) {
 		Model(&member).
 		Update("line_id", nil).
 		Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "無法更新用戶資料"})
+		c.JSON(http.StatusInternalServerError, gin.H{auth.ErrorKey: "無法更新用戶資料"})
 		return
 	}
 

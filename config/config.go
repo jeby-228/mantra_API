@@ -42,7 +42,7 @@ func Load() *Config {
 		CORS: CORSConfig{
 			AllowOrigins: getEnvStringSlice(
 				"CORS_ALLOW_ORIGINS",
-				[]string{"http://localhost:5173", "http://localhost:4173"},
+				DefaultCORSAllowOrigins,
 			),
 		},
 	}

@@ -29,6 +29,10 @@ const (
 	// #nosec G101 -- This is a public LINE API path, not credentials.
 	lineTokenPath   = "/oauth2/v2.1/token"
 	lineProfilePath = "/v2/profile"
+
+	testPassword        = "password123"
+	testLineRedirectURI = "http://localhost:5173/auth/callback"
+	testValidLineCode   = "valid-code"
 )
 
 func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -100,7 +104,7 @@ func TestRegister_Success(t *testing.T) {
 	req := makeJSONPostRequest(t, "/register", RegisterRequest{
 		Name:     "Jeby",
 		Email:    "jeby@example.com",
-		Password: "password123",
+		Password: testPassword,
 	})
 	w := httptest.NewRecorder()
 
@@ -121,7 +125,7 @@ func TestRegister_Success(t *testing.T) {
 	err = testDB.Where("email = ?", "jeby@example.com").First(&member).Error
 	assert.NoError(t, err)
 	assert.Equal(t, audit.SelfRegistrationCreatorID, member.CreatorId)
-	assert.NotEqual(t, "password123", member.PasswordHash)
+	assert.NotEqual(t, testPassword, member.PasswordHash)
 	assert.NotEmpty(t, member.PasswordHash)
 }
 
@@ -130,7 +134,7 @@ func TestRegister_DuplicateEmail(t *testing.T) {
 	testDB := newAuthControllerTestDB(t)
 	SetDB(testDB)
 
-	hash, err := auth.HashPassword("password123")
+	hash, err := auth.HashPassword(testPassword)
 	assert.NoError(t, err)
 
 	seed := models.Member{
@@ -151,7 +155,7 @@ func TestRegister_DuplicateEmail(t *testing.T) {
 	req := makeJSONPostRequest(t, "/register", RegisterRequest{
 		Name:     "Another",
 		Email:    "exists@example.com",
-		Password: "password123",
+		Password: testPassword,
 	})
 	w := httptest.NewRecorder()
 
@@ -166,7 +170,7 @@ func TestLogin_Success(t *testing.T) {
 	testDB := newAuthControllerTestDB(t)
 	SetDB(testDB)
 
-	hash, err := auth.HashPassword("password123")
+	hash, err := auth.HashPassword(testPassword)
 	assert.NoError(t, err)
 
 	seed := models.Member{
@@ -186,7 +190,7 @@ func TestLogin_Success(t *testing.T) {
 
 	req := makeJSONPostRequest(t, "/login", LoginRequest{
 		Email:    "tester@example.com",
-		Password: "password123",
+		Password: testPassword,
 	})
 	w := httptest.NewRecorder()
 
@@ -208,7 +212,7 @@ func TestLogin_WrongPassword(t *testing.T) {
 	testDB := newAuthControllerTestDB(t)
 	SetDB(testDB)
 
-	hash, err := auth.HashPassword("password123")
+	hash, err := auth.HashPassword(testPassword)
 	assert.NoError(t, err)
 
 	seed := models.Member{
@@ -290,7 +294,7 @@ func TestBindLine_UnauthorizedWhenNoUserID(t *testing.T) {
 
 	req := makeJSONPostRequest(t, "/auth/line/bind", LineLoginRequest{
 		Code:        "fake-code",
-		RedirectURI: "http://localhost:5173/auth/callback",
+		RedirectURI: testLineRedirectURI,
 	})
 	w := httptest.NewRecorder()
 
@@ -320,7 +324,7 @@ func TestLineLogin_InvalidAuthorizationCode(t *testing.T) {
 
 	req := makeJSONPostRequest(t, "/auth/line", LineLoginRequest{
 		Code:        "bad-code",
-		RedirectURI: "http://localhost:5173/auth/callback",
+		RedirectURI: testLineRedirectURI,
 	})
 	w := httptest.NewRecorder()
 
@@ -359,8 +363,8 @@ func TestLineLogin_CreatesMemberOnFirstLogin(t *testing.T) {
 	router.POST("/auth/line", LineLogin)
 
 	req := makeJSONPostRequest(t, "/auth/line", LineLoginRequest{
-		Code:        "valid-code",
-		RedirectURI: "http://localhost:5173/auth/callback",
+		Code:        testValidLineCode,
+		RedirectURI: testLineRedirectURI,
 	})
 	w := httptest.NewRecorder()
 
@@ -437,8 +441,8 @@ func TestBindLine_ConflictWhenLineIDBoundByAnotherMember(t *testing.T) {
 	})
 
 	req := makeJSONPostRequest(t, "/auth/line/bind", LineLoginRequest{
-		Code:        "valid-code",
-		RedirectURI: "http://localhost:5173/auth/callback",
+		Code:        testValidLineCode,
+		RedirectURI: testLineRedirectURI,
 	})
 	w := httptest.NewRecorder()
 
@@ -502,8 +506,8 @@ func TestBindLine_IdempotentWhenAlreadyBoundToCurrentMember(t *testing.T) {
 	})
 
 	req := makeJSONPostRequest(t, "/auth/line/bind", LineLoginRequest{
-		Code:        "valid-code",
-		RedirectURI: "http://localhost:5173/auth/callback",
+		Code:        testValidLineCode,
+		RedirectURI: testLineRedirectURI,
 	})
 	w := httptest.NewRecorder()
 

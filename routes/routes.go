@@ -56,7 +56,7 @@ func SetupRouter(router *gin.Engine) {
 		if graphqlHandler == nil {
 			c.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": "GraphQL handler not initialized"},
+				gin.H{auth.ErrorKey: "GraphQL handler not initialized"},
 			)
 			return
 		}

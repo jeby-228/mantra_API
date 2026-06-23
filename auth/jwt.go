@@ -36,7 +36,7 @@ func GenerateToken(userID uuid.UUID, email string) (string, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "member-api",
+			Issuer:    JWTIssuer,
 		},
 	}
 

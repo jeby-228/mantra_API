@@ -60,7 +60,7 @@ swagger:
 
 # 清理
 clean:
-    rm -rf bin/ coverage.out coverage.html
+    rm -rf bin/ coverage.out coverage.html mantra_API
 
 # 一鍵檢查
 auto_check:
@@ -69,5 +69,6 @@ auto_check:
     just lint
     just test
     just build
+    just swagger
     just graphql
     just test-cov

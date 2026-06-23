@@ -8,6 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testDefaultStringValue = "default"
+	testExampleOrigin      = "https://example.com"
+	testAppExampleOrigin   = "https://app.example.com"
+	testNameEnvNotSet      = "環境變數不存在使用預設值"
+	testNameEnvEmptyString = "環境變數為空字串使用預設值"
+)
+
 func TestLoad(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -33,7 +41,7 @@ func TestLoad(t *testing.T) {
 				assert.Equal(t, "8080", cfg.Server.Port)
 				assert.Equal(
 					t,
-					[]string{"http://localhost:5173", "http://localhost:4173"},
+					DefaultCORSAllowOrigins,
 					cfg.CORS.AllowOrigins,
 				)
 			},
@@ -45,7 +53,7 @@ func TestLoad(t *testing.T) {
 				_ = os.Setenv("DB_MAX_OPEN_CONNS", "50")
 				_ = os.Setenv("DB_MAX_IDLE_CONNS", "10")
 				_ = os.Setenv("PORT", "8080")
-				_ = os.Setenv("CORS_ALLOW_ORIGINS", "https://example.com,https://app.example.com")
+				_ = os.Setenv("CORS_ALLOW_ORIGINS", testExampleOrigin+","+testAppExampleOrigin)
 			},
 			cleanup: func() {
 				_ = os.Unsetenv("POSTGRES_DSN")
@@ -62,7 +70,7 @@ func TestLoad(t *testing.T) {
 				assert.Equal(t, "8080", cfg.Server.Port)
 				assert.Equal(
 					t,
-					[]string{"https://example.com", "https://app.example.com"},
+					[]string{testExampleOrigin, testAppExampleOrigin},
 					cfg.CORS.AllowOrigins,
 				)
 			},
@@ -87,7 +95,7 @@ func TestLoad(t *testing.T) {
 				assert.Equal(t, "3000", cfg.Server.Port)
 				assert.Equal(
 					t,
-					[]string{"http://localhost:5173", "http://localhost:4173"},
+					DefaultCORSAllowOrigins,
 					cfg.CORS.AllowOrigins,
 				)
 			},
@@ -118,13 +126,13 @@ func TestGetEnv(t *testing.T) {
 		{
 			name:         "環境變數存在",
 			key:          "TEST_KEY",
-			defaultValue: "default",
+			defaultValue: testDefaultStringValue,
 			envValue:     "custom_value",
 			setEnv:       true,
 			expected:     "custom_value",
 		},
 		{
-			name:         "環境變數不存在使用預設值",
+			name:         testNameEnvNotSet,
 			key:          "TEST_KEY_NOT_SET",
 			defaultValue: "default_value",
 			envValue:     "",
@@ -132,12 +140,12 @@ func TestGetEnv(t *testing.T) {
 			expected:     "default_value",
 		},
 		{
-			name:         "環境變數為空字串使用預設值",
+			name:         testNameEnvEmptyString,
 			key:          "TEST_KEY_EMPTY",
-			defaultValue: "default",
+			defaultValue: testDefaultStringValue,
 			envValue:     "",
 			setEnv:       true,
-			expected:     "default",
+			expected:     testDefaultStringValue,
 		},
 		{
 			name:         "預設值為空字串",
@@ -180,7 +188,7 @@ func TestGetEnvInt(t *testing.T) {
 			expected:     100,
 		},
 		{
-			name:         "環境變數不存在使用預設值",
+			name:         testNameEnvNotSet,
 			key:          "TEST_INT_NOT_SET",
 			defaultValue: 50,
 			envValue:     "",
@@ -212,7 +220,7 @@ func TestGetEnvInt(t *testing.T) {
 			expected:     0,
 		},
 		{
-			name:         "環境變數為空字串使用預設值",
+			name:         testNameEnvEmptyString,
 			key:          "TEST_INT_EMPTY",
 			defaultValue: 20,
 			envValue:     "",
@@ -246,7 +254,7 @@ func TestConfigStructure(t *testing.T) {
 			Port: "8080",
 		},
 		CORS: CORSConfig{
-			AllowOrigins: []string{"https://example.com"},
+			AllowOrigins: []string{testExampleOrigin},
 		},
 	}
 
@@ -255,7 +263,7 @@ func TestConfigStructure(t *testing.T) {
 	assert.Equal(t, 50, cfg.Database.MaxIdleConns)
 	assert.Equal(t, 2*time.Hour, cfg.Database.ConnMaxLifetime)
 	assert.Equal(t, "8080", cfg.Server.Port)
-	assert.Equal(t, []string{"https://example.com"}, cfg.CORS.AllowOrigins)
+	assert.Equal(t, []string{testExampleOrigin}, cfg.CORS.AllowOrigins)
 }
 
 func TestGetEnvStringSlice(t *testing.T) {
@@ -270,7 +278,7 @@ func TestGetEnvStringSlice(t *testing.T) {
 		{
 			name:         "環境變數為多個來源",
 			key:          "TEST_SLICE",
-			defaultValue: []string{"http://localhost:5173"},
+			defaultValue: []string{DefaultCORSOriginDev},
 			envValue:     "https://a.com,https://b.com",
 			setEnv:       true,
 			expected:     []string{"https://a.com", "https://b.com"},
@@ -278,26 +286,26 @@ func TestGetEnvStringSlice(t *testing.T) {
 		{
 			name:         "環境變數為單一來源",
 			key:          "TEST_SLICE_SINGLE",
-			defaultValue: []string{"http://localhost:5173"},
-			envValue:     "https://example.com",
+			defaultValue: []string{DefaultCORSOriginDev},
+			envValue:     testExampleOrigin,
 			setEnv:       true,
-			expected:     []string{"https://example.com"},
+			expected:     []string{testExampleOrigin},
 		},
 		{
-			name:         "環境變數不存在使用預設值",
+			name:         testNameEnvNotSet,
 			key:          "TEST_SLICE_NOT_SET",
-			defaultValue: []string{"http://localhost:5173", "http://localhost:4173"},
+			defaultValue: DefaultCORSAllowOrigins,
 			envValue:     "",
 			setEnv:       false,
-			expected:     []string{"http://localhost:5173", "http://localhost:4173"},
+			expected:     DefaultCORSAllowOrigins,
 		},
 		{
-			name:         "環境變數為空字串使用預設值",
+			name:         testNameEnvEmptyString,
 			key:          "TEST_SLICE_EMPTY",
-			defaultValue: []string{"http://localhost:5173"},
+			defaultValue: []string{DefaultCORSOriginDev},
 			envValue:     "",
 			setEnv:       true,
-			expected:     []string{"http://localhost:5173"},
+			expected:     []string{DefaultCORSOriginDev},
 		},
 	}
 
