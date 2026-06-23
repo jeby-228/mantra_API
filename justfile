@@ -1,18 +1,12 @@
 # 會員 API 專案的 Justfile
 default:
-    just --fmt --unstable 2> /dev/null
-    just --list --unsorted
+    @just --list
 
 # 初始化開發環境
 setup:
     @echo "安裝 golangci-lint..."
-    @curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ./bin
-    @echo "安裝 swag..."
-    @SWAG_BIN="${GOBIN:-$(go env GOPATH)/bin}/swag"; \
-    if [ ! -x "$SWAG_BIN" ]; then \
-        go install github.com/swaggo/swag/cmd/swag@latest; \
-    fi; \
-    "$SWAG_BIN" --version
+    @mkdir -p bin
+    GOBIN="$(pwd)/bin" go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
     @echo "安裝相依套件..."
     go mod download
     @echo "設定完成！"
@@ -51,26 +45,18 @@ test-coverage:
 
 # 測試覆蓋率產生報告
 test-cov:
-    @echo "產生測試覆蓋率報告..."
-    @go test -v -coverprofile=coverage.out ./auth ./config ./services ./controllers
-    @if [ -f coverage.out ]; then \
-        go tool cover -html=coverage.out -o coverage.html && \
-        echo "測試覆蓋率報告已產生：coverage.html"; \
-    else \
-        echo "沒有可用的覆蓋率資料"; \
-    fi
+    go test -v -coverprofile=coverage.out ./...
+    go tool cover -html=coverage.out -o coverage.html
+
 
 # 生成 GraphQL
 graphql:
     go get github.com/99designs/gqlgen@v0.17.85
     go run github.com/99designs/gqlgen generate
 
-# 生成 swagger
-swag:
-    @SWAG_BIN="${GOBIN:-$(go env GOPATH)/bin}/swag"; \
-    [ -x "$SWAG_BIN" ] || SWAG_BIN="$(command -v swag 2>/dev/null || true)"; \
-    [ -n "$SWAG_BIN" ] || { echo "swag 尚未安裝，請先執行 just setup"; exit 1; }; \
-    "$SWAG_BIN" init
+# 生成 Swagger 文件
+swagger:
+    go run github.com/swaggo/swag/cmd/swag@v1.16.6 init
 
 # 清理
 clean:
